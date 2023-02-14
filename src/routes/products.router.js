@@ -57,7 +57,7 @@ routerProductos.post('/',(req,res)=>{
     let error = false;
     const products = JSON.parse(fs.readFileSync(path+'/productos.json'));
     //Validaciones
-    let {title,description,code,price,stock,category} = req.body;
+    let {title,description,code,price,stock,category,thumbnails} = req.body;
     !title ? (requiredErrors+="Falta title\n" , error=true) : null; 
     !description ? (requiredErrors+="Falta description\n" , error=true) : null; 
     !code ? (requiredErrors+="Falta code\n" , error=true) : (products.length!==0 ? (products.find(prod => prod.code===code) ? (requiredErrors+= "Producto con este codigo ya existe", error=true):null):null);
@@ -82,8 +82,8 @@ routerProductos.post('/',(req,res)=>{
             price: price,
             status: true,
             stock: stock,
-            category: category
-            //thumbnails: 
+            category: category,
+            thumbnails: thumbnails 
         });
         fs.writeFileSync(path+'/productos.json',JSON.stringify(products));
         res.status(200).send(`<h1 style="text-align:center;">Producto insertado correctamente</h1>`);
