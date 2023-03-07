@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import viewsRouter from "./routes/views.router.js";
 import __dirname from "./utils.js";
 //Create the storage
-const path = './public/storage';
+const path = __dirname+'/public/storage';
 if(!fs.existsSync(path)){
     fs.mkdirSync(path);
 }
@@ -39,15 +39,15 @@ const socketServer = new Server(server);
 socketServer.on('connection',socket=>{
     console.log("Server: cliente conectado");
     //Send products to new socket
-    socket.emit("sendRTProducts",JSON.parse(fs.readFileSync('./public/storage/productos.json')));
+    socket.emit("sendRTProducts",JSON.parse(fs.readFileSync(path+'/productos.json')));
     //delete product by id, then send the id to all sockets and a success message to request socket
     socket.on("deleteProduct",(id)=>{
-        const products = JSON.parse(fs.readFileSync('./public/storage/productos.json'));
+        const products = JSON.parse(fs.readFileSync(path+'/productos.json'));
         let producto = products.find((prod) => prod.id == id);
         if(producto){
             let index = products.indexOf(producto);
             products.splice(index,1);
-            fs.writeFileSync('./public/storage/productos.json',JSON.stringify(products));
+            fs.writeFileSync(path+'/productos.json',JSON.stringify(products));
             socketServer.emit("deletedProduct",producto.id);
             socket.emit("deleteSuccess","Producto eliminado correctamente");
         }else{
@@ -56,7 +56,7 @@ socketServer.on('connection',socket=>{
     });
     //Store new Product, then send to all sockets and success message to request socket
     socket.on('storeProduct',(product)=>{
-        const products = JSON.parse(fs.readFileSync('./public/storage/productos.json'));
+        const products = JSON.parse(fs.readFileSync(path+'/productos.json'));
         let codeExists = products.find(prod => prod.code===product.code);
         if(codeExists) {
             socket.emit("newProdCodeError","El código ya existe");
@@ -78,7 +78,7 @@ socketServer.on('connection',socket=>{
                 category: product.category,
             };
             products.push(newProduct);
-            fs.writeFileSync('./public/storage/productos.json',JSON.stringify(products));
+            fs.writeFileSync(path+'/productos.json',JSON.stringify(products));
             socketServer.emit("addedProduct",newProduct);
             socket.emit("storeSuccess","Producto guardado correctamente");
         }
