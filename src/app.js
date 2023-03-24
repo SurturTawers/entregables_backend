@@ -2,8 +2,12 @@ import express from 'express';
 import handlebars from "express-handlebars";
 import {Server} from 'socket.io';
 import * as fs from 'fs';
+import {init} from './db/mongoose.js'
 //import routerProductos from './routes/products.router.js';
 //import routerCarrito from './routes/carts.router.js';
+import mongoCartsRouter from './dao/dbCarts.router.js';
+import mongoProductsRouter from './dao/dbProducts.router.js';
+
 import viewsRouter from "./routes/views.router.js";
 import __dirname from "./utils.js";
 //Create the storage
@@ -15,6 +19,7 @@ if(!fs.existsSync(path+'/productos.json')){
     fs.writeFileSync(path+'/productos.json', JSON.stringify([]));
 }
 
+init();
 const app = express();
 app.engine('handlebars',handlebars.engine({
     layoutsDir: __dirname+"/views/layouts",
@@ -29,6 +34,9 @@ app.use(express.static(__dirname+'/public'));
 //app.use('/api/products',routerProductos);
 //app.use('/api/carts',routerCarrito);
 app.use('/',viewsRouter);
+app.use('/api/products',mongoProductsRouter);
+app.use('/api/carts',mongoCartsRouter);
+
 
 const server = app.listen(8080, ()=>{
     console.log("Listening on 8080");
