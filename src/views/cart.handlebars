@@ -1,0 +1,11 @@
+<h1 style="text-align:center;">Carrito {{cart._id}}</h1>
+{{#each products}}
+    <form action="api/carts/{{cart._id}}/products/{{_id}}" method="delete">
+        <div id="{{_id}}" style="background-color:lightblue; text-align:center" >
+            <p>{{productInfo.title}}</p>
+            <p>ID: {{_id}}</p>
+            <p>Cantidad: {{count}}</p>
+            <!--<button type="submit">remove from cart</button>-->
+        </div>
+    </form>
+{{/each}}

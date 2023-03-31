@@ -1,15 +1,18 @@
-import express from 'express';
-import handlebars from "express-handlebars";
-import {Server} from 'socket.io';
-import * as fs from 'fs';
-import {init} from './db/mongoose.js'
+//import {Server} from 'socket.io';
+//import * as fs from 'fs';
 //import routerProductos from './routes/products.router.js';
 //import routerCarrito from './routes/carts.router.js';
+import express from 'express';
+import handlebars from "express-handlebars";
+import viewsRouter from "./routes/views.router.js";
 import mongoCartsRouter from './dao/dbCarts.router.js';
 import mongoProductsRouter from './dao/dbProducts.router.js';
-
-import viewsRouter from "./routes/views.router.js";
+import {init} from './db/mongoose.js'
 import __dirname from "./utils.js";
+import dotenv from 'dotenv'
+dotenv.config();
+
+/*
 //Create the storage
 const path = __dirname+'/public/storage';
 if(!fs.existsSync(path)){
@@ -18,7 +21,8 @@ if(!fs.existsSync(path)){
 if(!fs.existsSync(path+'/productos.json')){
     fs.writeFileSync(path+'/productos.json', JSON.stringify([]));
 }
-
+*/
+//db init
 init();
 const app = express();
 app.engine('handlebars',handlebars.engine({
@@ -29,20 +33,19 @@ app.set('view engine','handlebars');
 app.set('views',__dirname+'/views');
 
 app.use(express.static(__dirname+'/public'));
-//app.use(express.json());
-//app.use(express.urlencoded({extended:true}));
-//app.use('/api/products',routerProductos);
-//app.use('/api/carts',routerCarrito);
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 app.use('/',viewsRouter);
 app.use('/api/products',mongoProductsRouter);
 app.use('/api/carts',mongoCartsRouter);
+//app.use('/api/products',routerProductos);
+//app.use('/api/carts',routerCarrito);
 
-
-const server = app.listen(8080, ()=>{
-    console.log("Listening on 8080");
+const server = app.listen(process.env.APP_PORT || 8080, ()=>{
+    console.log("Listening on http://localhost:"+process.env.APP_PORT || 8080);
 })
 server.on("error",error=>console.log(error));
-
+/*
 const socketServer = new Server(server);
 socketServer.on('connection',socket=>{
     console.log("Server: cliente conectado");
@@ -92,3 +95,4 @@ socketServer.on('connection',socket=>{
         }
     });
 });
+*/

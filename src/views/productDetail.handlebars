@@ -1,0 +1,28 @@
+<div id="{{product._id}}" style="background-color:lightblue; text-align:center" >
+    <h2>{{product.title}}</h2>
+    <h3>ID: {{product._id}}</h3>
+    <p><b>Description:</b> {{product.description}}</p>
+    <p><b>Codigo:</b> {{product.code}}</p>
+    <p><b>Precio:</b> {{product.price}}</p>
+    <p><b>Status:</b> {{product.status}}</p>
+    <p><b>Stock:</b> {{product.stock}}</p>
+    <p><b>Category:</b> {{product.category}}</p>
+    <button type="button" onclick="submitProduct(document.getElementById('{{product._id}}').id)">Agregar al carrito</button>
+</div>
+
+<script>
+    function submitProduct(id){
+        const ids = [];
+        ids.push(id);
+        fetch('http://localhost:8080/api/carts/6425b9604ef1c4fb279426f3', {
+            method: "PUT",
+            headers:{
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(ids)
+        })
+        .then(()=>{
+            alert("Agregado correctamente en carrito 6425b9604ef1c4fb279426f3")
+        });/**/
+    }
+</script>
