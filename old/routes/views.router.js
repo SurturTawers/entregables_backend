@@ -1,79 +1,14 @@
 import { Router } from "express";
-import productsModel from "../db/models/products.js";
-import cartsModel from "../db/models/carts.js";
-import UserModel from '../db/models/users.js';
-
+import __dirname from "../utils.js";
+import * as fs from 'fs';
+import productsModel from "../dao/models/products.js";
+import cartsModel from "../dao/models/carts.js";
 const viewsRouter = Router();
 
+const path = __dirname+'/public/storage';
 viewsRouter.get('/',(req,res)=>{
-    res.redirect('/login');
-});
-
-viewsRouter.get('/register',(req,res)=>{
-    res.render('register')
-});
-viewsRouter.post('/register',async (req,res)=>{
-    const {
-        body: {
-            userEmail,
-            userPassword
-        }
-    } = req;
-    console.log(req.body);
-
-    if(!userEmail || !userPassword) res.render('register',{error: "Faltan campos"});
-    try{
-        const user = await UserModel.create({
-            userEmail,
-            userPassword
-        });
-        res.redirect('/login');
-    }catch(error){
-        res.render('register',{error: error});
-    } 
-});
-
-viewsRouter.get('/login',(req,res)=>{
-    res.render('login');
-});
-
-viewsRouter.post('/login',async (req,res)=>{
-    const {
-        body:{
-            userEmail,
-            userPassword
-        }
-    } = req;
-    console.log(req.body);
-    if(!userEmail || !userPassword) res.render('login',{error: "Faltan campos"});
-    let email = userEmail;
-    let password = userPassword;
-    if(userEmail.includes('admin') && userPassword.includes('admin')){
-        email = userEmail.split('admin');
-        password = userPassword.split('admin');
-        req.session.role = 'admin';
-    }else{
-        req.session.role='usuario';
-    }
-    try{
-        const usuario = await UserModel.findOne({email});
-        if(!usuario) res.render('login',{error:"Credenciales incorrectas"});
-        if(usuario.password != password) res.render('login',{error: "Credenciales incorrectas"});
-        req.session.user = user;
-        res.redirect('/products');
-    }catch(error){
-        res.render('login',{error: error});
-    }
-});
-
-viewsRouter.post('/logout',(req,res)=>{
-    req.session.destroy((error) => {
-        if (!error) {
-          res.redirect('/login');
-        } else {
-          res.send({status: 'Logout Error', body: error })
-        }
-    });
+    const products = JSON.parse(fs.readFileSync(path+'/productos.json'));
+    res.render('home',{products:products});
 });
 
 viewsRouter.get('/products',async (req,res)=>{
@@ -90,12 +25,13 @@ viewsRouter.get('/products',async (req,res)=>{
         prevLink: pagRes.hasPrevPage?`http://localhost:${process.env.APP_PORT}+"/api/products?limit=${limit?limit:10}&page=${page?page-1:null}&${sort?`sort=${sort}`:null}&${query?`query=${query}`:null}`:null,
         nextLink: pagRes.hasNextPage?`http://localhost:${process.env.APP_PORT}+"/api/products?limit=${limit?limit:10}&page=${page?page+1:null}&${sort?`sort=${sort}`:null}&${query?`query=${query}`:null}`:null
     }
-    res.render('products',{pageInfo: responseData, productos:responseData.payload.map(doc => doc.toJSON()),length:pagRes.totalDocs, usuario: req.session.user, rol: req.session.role});
+    res.render('products',{pageInfo: responseData, productos:responseData.payload.map(doc => doc.toJSON()),length:pagRes.totalDocs});
 });
 
 viewsRouter.get('/products/:pid',async (req,res)=>{
     const {params: {pid}} = req;
     const result = await productsModel.findOne({_id:pid});
+    //console.log(result);
     res.render('productDetail',{product:result.toJSON()});
 });
 
@@ -134,6 +70,10 @@ viewsRouter.get('/carts/:cid',async (req,res)=>{
         }
     ]);
     res.render('cart',{cart:result.toJSON(), products: count});
+});
+
+viewsRouter.get('/realTimeProducts',(req,res)=>{
+    res.render('realTimeProducts');
 });
 
 export default viewsRouter;

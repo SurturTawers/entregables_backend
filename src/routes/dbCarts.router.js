@@ -1,5 +1,5 @@
 import { Router } from "express";
-import cartsModel from './models/carts.js';
+import cartsModel from '../db/models/carts.js';
 const mongoCartsRouter = Router();
 
 //crea un carrito

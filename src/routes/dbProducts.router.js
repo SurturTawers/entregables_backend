@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import productsModel from './models/products.js';
+import productsModel from '../db/models/products.js';
 const mongoProductsRouter = Router();
 
 //mostrar productos por query, limit, page, sort
