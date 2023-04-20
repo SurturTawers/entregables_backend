@@ -2,68 +2,62 @@ import { Router } from "express";
 import productsModel from "../db/models/products.js";
 import cartsModel from "../db/models/carts.js";
 import UserModel from '../db/models/users.js';
+import passport from "passport";
 
 const viewsRouter = Router();
+
+const auth = (req,res,next)=>{
+    if(req.session.user){
+        return next();
+    }
+    res.redirect('/login');
+}
 
 viewsRouter.get('/',(req,res)=>{
     res.redirect('/login');
 });
 
+viewsRouter.get('/home',auth,(req,res)=>{
+    res.render('home');
+});
+
 viewsRouter.get('/register',(req,res)=>{
     res.render('register')
 });
-viewsRouter.post('/register',async (req,res)=>{
-    const {
-        body: {
-            userEmail,
-            userPassword
-        }
-    } = req;
-    console.log(req.body);
 
-    if(!userEmail || !userPassword) res.render('register',{error: "Faltan campos"});
-    try{
-        const user = await UserModel.create({
-            userEmail,
-            userPassword
-        });
-        res.redirect('/login');
-    }catch(error){
-        res.render('register',{error: error});
-    } 
+viewsRouter.post('/register', passport.authenticate('register',{failureRedirect:'/register'}),(req,res)=>{
+    res.redirect('/login');
 });
+/*
+function(req,res,next){
+        passport.authenticate('register',function(error, user, info){
+            if(error){
+                res.status(401).send('error');
+            }else if(!user){
+                res.status(401).send(info);
+            }else{
+                next();
+            }
+            res.status(401).send(info);
+        })(req,res);
+    },
+    function(req,res){
+        res.redirect('/login');
+});
+/**/
 
 viewsRouter.get('/login',(req,res)=>{
     res.render('login');
 });
 
-viewsRouter.post('/login',async (req,res)=>{
-    const {
-        body:{
-            userEmail,
-            userPassword
-        }
-    } = req;
-    console.log(req.body);
-    if(!userEmail || !userPassword) res.render('login',{error: "Faltan campos"});
-    let email = userEmail;
-    let password = userPassword;
-    if(userEmail.includes('admin') && userPassword.includes('admin')){
-        email = userEmail.split('admin');
-        password = userPassword.split('admin');
-        req.session.role = 'admin';
-    }else{
-        req.session.role='usuario';
-    }
-    try{
-        const usuario = await UserModel.findOne({email});
-        if(!usuario) res.render('login',{error:"Credenciales incorrectas"});
-        if(usuario.password != password) res.render('login',{error: "Credenciales incorrectas"});
-        req.session.user = user;
-        res.redirect('/products');
-    }catch(error){
-        res.render('login',{error: error});
-    }
+viewsRouter.post('/login',passport.authenticate('login',{failureRedirect: '/login'}) ,(req,res)=>{
+    req.session.user = req.user;
+    res.redirect('/home');
+});
+
+viewsRouter.get('/github/login', passport.authenticate('github',{failureRedirect: '/login'}), (req,res)=>{
+    req.session.user = req.user;
+    res.redirect('/home');
 });
 
 viewsRouter.post('/logout',(req,res)=>{
