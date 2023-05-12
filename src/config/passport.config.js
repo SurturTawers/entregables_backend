@@ -1,8 +1,10 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import {Strategy as GithubStrategy} from 'passport-github2';
-import UserModel from '../db/models/users.js'
 import { createHash, validatePassword } from "../utils/passwordEncrypt.js";
+import UserModel from '../db/models/users.js';
+import config from "./config.js";
+import AuthController from "../controllers/auth.controller.js";
 
 export const initPassport = ()=>{
     const options= {
@@ -11,58 +13,32 @@ export const initPassport = ()=>{
     };
 
     const githubOptions = {
-        clientID: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        clientID: config.githubClientID,
+        clientSecret: config.githubSecret,
         callbackURL: "http://127.0.0.1:8080/github/login"
     }
 
     passport.use('register',new LocalStrategy(options,async(req,email,password,done)=>{
         //console.log(req);
-        if(!email || !password) return done (new Error('Faltan campos'));
-        try{
-            let user = await UserModel.findOne({email});
-            if(user) return done(null,false);
-            user = await UserModel.create({
-                email,
-                password: createHash(password),
-            });
-            done(null,user);
-        }catch(error){
-            return done(new Error('Error al obtener usuario: ' + error.message))
-        }
+        const {fieldError, userExists, user, error} = AuthController.register(email,password);
+        if(fieldError) return done(new Error(fieldError));
+        if(error) return done(new Error(error));
+        if(userExists) return done(null,false);
+        if(user) return done(null,user);
     }));
 
     passport.use('login', new LocalStrategy(options, async (req,email,password,done)=>{
-        try{
-            const user = await UserModel.findOne({email});
-            if(!user) {
-                return done(null,false)
-            }
-            if(!validatePassword(password,user)) {
-                return done(null,false)
-            }
-            console.log(user);
-            done(null,user);
-        }catch(error){
-            return done(new Error("Error al obtener user: "+error.message));
-        }
+        const {fieldError, userExists, validatePswdError, user, error} = AuthController.login(email,password);
+        if(fieldError) return done(new Error(fieldError));
+        if(error) return done(new Error(error));
+        if(!userExists || validatePswdError) return done(null,false);
+        if(user) return done(null,user);
     }));
 
     passport.use('github', new GithubStrategy(githubOptions,async (access_token, refreshToken,profile,done)=>{
-        try{
-            console.log(profile);
-            let user = await UserModel.findOne({email: profile._json.email});
-            if(!user){
-                user = await UserModel.create({
-                    email: profile._json.email,
-                    password: ''
-                });
-            }
-            console.log(user);
-            done(null,user);
-        }catch(error){
-            return done(new Error('Error al obtener usuario: '+ error.message));
-        }
+        const {error,user} = AuthController.githubLogin(profile);
+        if(error) return done(new Error(error));
+        if(user) return done(null,user);
     }));
 
     passport.serializeUser((user,done)=>{

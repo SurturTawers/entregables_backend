@@ -1,17 +1,16 @@
 import express from 'express';
-import handlebars from "express-handlebars";
-import viewsRouter from "./routes/views.router.js";
-import mongoCartsRouter from './routes/dbCarts.router.js';
-import mongoProductsRouter from './routes/dbProducts.router.js';
-import __dirname from "./utils.js";
-import {init} from './db/mongoose.js'
-import MongoStore from 'connect-mongo';
-import expressSession from 'express-session';
-import {initPassport} from './config/passport.config.js';
 import passport from 'passport';
+import handlebars from "express-handlebars";
+import expressSession from 'express-session';
+import router from './routers/index.router.js';
+import MongoStore from 'connect-mongo';
+import {init} from './db/mongoose.js'
+import {initPassport} from './config/passport.config.js';
+import __dirname from "./utils.js";
+import config from './config/config.js';
 //db init
 await init();
-const app = express();
+const app = express(); 
 app.engine('handlebars',handlebars.engine({
     layoutsDir: __dirname+"/views/layouts",
     defaultLayout:'main'
@@ -25,14 +24,14 @@ app.use(express.static(__dirname+'/public'));
 
 app.use(expressSession({
     store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
+        mongoUrl: config.mongoUrl,
         mongoOptions: {
             useNewUrlParser: true,
             useUnifiedTopology: true
         },
         ttl:90,
     }),
-    secret: process.env.SESSION_SECRET,
+    secret: config.sessionSecret,
     resave: true, //mantiene activa la sesion
     saveUninitialized: true //permite guardar aunque no se haya guardado info de sesion
 }));
@@ -41,11 +40,9 @@ initPassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/',viewsRouter);
-//app.use('/api/products',mongoProductsRouter);
-//app.use('/api/carts',mongoCartsRouter);
+app.use('/',router);
 
-const server = app.listen(process.env.APP_PORT || 8080, ()=>{
-    console.log("Listening on http://localhost:"+process.env.APP_PORT || 8080);
+const server = app.listen(config.port || 8080, ()=>{
+    console.log("Listening on http://localhost:" + config.port || 8080);
 })
 server.on("error",error=>console.log(error));

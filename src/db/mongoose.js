@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
+import config from '../config/config';
+
 export const init = async () =>{
     try {
-        const URI = process.env.MONGODB_URI;
+        const URI = config.mongoUrl;
         await mongoose.connect(URI);
         console.log("DB connected");
     } catch (error) {
