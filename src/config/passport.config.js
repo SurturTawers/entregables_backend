@@ -20,7 +20,7 @@ export const initPassport = ()=>{
 
     passport.use('register',new LocalStrategy(options,async(req,email,password,done)=>{
         //console.log(req);
-        const {fieldError, userExists, user, error} = AuthController.register(email,password);
+        const {fieldError, userExists, user, error} = await AuthController.register(email,password);
         if(fieldError) return done(new Error(fieldError));
         if(error) return done(new Error(error));
         if(userExists) return done(null,false);
@@ -28,15 +28,15 @@ export const initPassport = ()=>{
     }));
 
     passport.use('login', new LocalStrategy(options, async (req,email,password,done)=>{
-        const {fieldError, userExists, validatePswdError, user, error} = AuthController.login(email,password);
+        const {fieldError, userExists, validatePswdError, user, error} = await AuthController.login(email,password);
         if(fieldError) return done(new Error(fieldError));
         if(error) return done(new Error(error));
-        if(!userExists || validatePswdError) return done(null,false);
+        if(userExists===false|| validatePswdError) return done(null,false);
         if(user) return done(null,user);
     }));
 
     passport.use('github', new GithubStrategy(githubOptions,async (access_token, refreshToken,profile,done)=>{
-        const {error,user} = AuthController.githubLogin(profile);
+        const {error,user} = await AuthController.githubLogin(profile);
         if(error) return done(new Error(error));
         if(user) return done(null,user);
     }));

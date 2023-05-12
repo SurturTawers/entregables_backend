@@ -5,7 +5,7 @@ class AuthController{
     static async register(email, password){
         if(!email || !password) return {fieldError: "Faltan campos"};
         try{
-            let user = UsersServices.get({email});
+            let user = await UsersServices.get({email});
             if(user) return {userExists: true};
             user = UsersServices.create({
                 email,
@@ -17,25 +17,24 @@ class AuthController{
         }
     }
 
-    static login(email,password){
+    static async login(email,password){
         if(!email || !password) return {fieldError: "Faltan campos"};
         try{
-            const user = UsersServices.get{email});
+            const user = await UsersServices.get({email});
             if(!user) return {userExists: false};
             if(!validatePassword(password,user)) return {validatePswdError: true};
-            //console.log(user);
             return {user:user};
         }catch(error){
             return {error: "Error al obtener user: " + error.message};
         }
     }
 
-    static githubLogin(profile){
+    static async githubLogin(profile){
         try{
             //console.log(profile);
-            let user = UsersServices.get({email: profile._json.email});
+            let user = await UsersServices.get({email: profile._json.email});
             if(!user){
-                user = UsersServices.create({
+                user = await UsersServices.create({
                     email: profile._json.email,
                     password: ''
                 });
@@ -47,7 +46,7 @@ class AuthController{
         }
     }
     
-    static logout(req){
+    static async logout(req){
         req.session.destroy((error) => {
             if (!error) {
               return {error: false};

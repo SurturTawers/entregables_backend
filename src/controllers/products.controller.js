@@ -1,7 +1,7 @@
 import ProductsServices from '../services/products.services.js';
 class ProductsController{
-    static getProducts(limit, page, sort, query){
-        const pagRes = ProductsServices.getAll(limit,page,sort,query);
+    static async getProducts(limit, page, sort, query){
+        const pagRes = await ProductsServices.getAll(limit,page,sort,query);
         //console.log(pagRes);
         return {
             responseData: {
@@ -20,9 +20,9 @@ class ProductsController{
         };
     }
 
-    static createProduct(product){
+    static async createProduct(product){
         try{
-            const result = ProductsServices.create(product);
+            const result = await ProductsServices.create(product);
             return {result: result};
         }catch(error){
             console.log(error);
@@ -30,16 +30,19 @@ class ProductsController{
         };
     }
 
-    static getProductById(id){
-        return ProductsServices.getById(id);
+    static async getProductById(id){
+        const result = await ProductsServices.getById(id);
+        return result;
     }
 
-    static updateProductById(id, fields){
-        return ProductsServices.update(id, fields);
+    static async updateProductById(id, fields){
+        const result = await ProductsServices.update(id, fields);
+        return result;
     }
 
-    static deleteProductById(id){
-        return ProductsServices.delete(id);
+    static async deleteProductById(id){
+        const result = await ProductsServices.delete(id);
+        return result;
     }
 }
 

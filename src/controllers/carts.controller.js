@@ -1,17 +1,19 @@
-import CartsServices from "../services/carts.services";
+import CartsServices from "../services/carts.services.js";
 
 class CartsController{
-    static createCart(){
-        return CartsServices.create();
+    static async createCart(){
+        const result = await CartsServices.create();
+        return result;
     }
 
-    static showCartById(id){
-        return CartsServices.getById(id, 'products');
+    static async showCartById(id){
+        const cart = await CartsServices.getById(id, 'products');
+        return cart;
     }
 
-    static cartCheckout(id){
-        const result = CartsServices.getById(id);
-        const count = CartsServices.aggregate([
+    static async cartCheckout(id){
+        const result = await CartsServices.getById(id);
+        const count = await CartsServices.aggregate([
             {//desenvuelve el array
                 $unwind: "$products"
             },
@@ -45,21 +47,24 @@ class CartsController{
         return {result: result, count:count};
     }
 
-    static deleteCartById(id){
-        return CartsServices.update({_id:cid},{$set:{products:[]}});
+    static async deleteCartById(id){
+        const result = await CartsServices.update({_id:cid},{$set:{products:[]}});
+        return result;
     }
 
-    static updateCartById(id, products){
-        return CartsServices.update({_id:id},{$push:{products:{$each:products}}});
+    static async updateCartById(id, products){
+        const result = await CartsServices.update({_id:id},{$push:{products:{$each:products}}});
+        return result;
     }
 
-    static deleteProductFromCart(cid, pid){
-        return CartsServices.update({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
+    static async deleteProductFromCart(cid, pid){
+        const result = await CartsServices.update({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
+        return result;
     }
 
-    static updateCartProductQty(cid, pid, qty){
+    static async updateCartProductQty(cid, pid, qty){
         //remove all products with pid
-        const resultRemove = CartsServices.update({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
+        const resultRemove = await CartsServices.update({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
         if(!resultRemove) return {error: "Error on remove"};
         //set array of pid products by given number
         const productArray = [];
@@ -67,7 +72,7 @@ class CartsController{
             productArray.push({_id:pid});
         }
         //insert each product to products array
-        const result = CartsServices.update({_id:cid},{$push:{products: {$each:productArray}}});
+        const result = await CartsServices.update({_id:cid},{$push:{products: {$each:productArray}}});
         return {result: result};
     }
 }
