@@ -1,13 +1,13 @@
-import UserModel from '../db/models/users.js';
+import UsersServices from '../services/users.services.js';
 import { createHash, validatePassword } from '../utils/passwordEncrypt.js';
 
 class AuthController{
     static async register(email, password){
         if(!email || !password) return {fieldError: "Faltan campos"};
         try{
-            let user = await UserModel.findOne({email});
+            let user = UsersServices.get({email});
             if(user) return {userExists: true};
-            user = await UserModel.create({
+            user = UsersServices.create({
                 email,
                 password: createHash(password),
             });
@@ -17,10 +17,10 @@ class AuthController{
         }
     }
 
-    static async login(email,password){
+    static login(email,password){
         if(!email || !password) return {fieldError: "Faltan campos"};
         try{
-            const user = await UserModel.findOne({email});
+            const user = UsersServices.get{email});
             if(!user) return {userExists: false};
             if(!validatePassword(password,user)) return {validatePswdError: true};
             //console.log(user);
@@ -30,12 +30,12 @@ class AuthController{
         }
     }
 
-    static async githubLogin(profile){
+    static githubLogin(profile){
         try{
             //console.log(profile);
-            let user = await UserModel.findOne({email: profile._json.email});
+            let user = UsersServices.get({email: profile._json.email});
             if(!user){
-                user = await UserModel.create({
+                user = UsersServices.create({
                     email: profile._json.email,
                     password: ''
                 });

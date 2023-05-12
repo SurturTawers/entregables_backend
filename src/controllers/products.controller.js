@@ -1,7 +1,7 @@
-import productsModel from '../db/models/products.js';
+import ProductsServices from '../services/products.services.js';
 class ProductsController{
-    static async getProducts(limit, page, sort, query){
-        const pagRes = await productsModel.paginate(query?{query}:{},{limit:limit?limit:10,page:page?page:1,sort:sort?sort:0});
+    static getProducts(limit, page, sort, query){
+        const pagRes = ProductsServices.getAll(limit,page,sort,query);
         //console.log(pagRes);
         return {
             responseData: {
@@ -20,9 +20,9 @@ class ProductsController{
         };
     }
 
-    static async createProduct(product){
+    static createProduct(product){
         try{
-            const result =  await productsModel.create(product);
+            const result = ProductsServices.create(product);
             return {result: result};
         }catch(error){
             console.log(error);
@@ -30,16 +30,16 @@ class ProductsController{
         };
     }
 
-    static async getProductById(id){
-        return await productsModel.findOne({_id:id});
+    static getProductById(id){
+        return ProductsServices.getById(id);
     }
 
-    static async updateProductById(id, fields){
-        return await productsModel.updateOne({_id:id},{$set:fields});
+    static updateProductById(id, fields){
+        return ProductsServices.update(id, fields);
     }
 
-    static async deleteProductById(id){
-        return await productsModel.deleteOne({_id:id});
+    static deleteProductById(id){
+        return ProductsServices.delete(id);
     }
 }
 

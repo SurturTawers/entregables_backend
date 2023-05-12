@@ -1,17 +1,17 @@
-import cartsModel from '../db/models/carts.js';
+import CartsServices from "../services/carts.services";
 
 class CartsController{
-    static async createCart(){
-        return await cartsModel.create({products:[]});
+    static createCart(){
+        return CartsServices.create();
     }
 
-    static async showCartById(id){
-        return await cartsModel.findOne({_id:id}).populate('products');
+    static showCartById(id){
+        return CartsServices.getById(id, 'products');
     }
 
-    static async cartCheckout(id){
-        const result = await cartsModel.findOne({_id:id});
-        const count = await cartsModel.aggregate([
+    static cartCheckout(id){
+        const result = CartsServices.getById(id);
+        const count = CartsServices.aggregate([
             {//desenvuelve el array
                 $unwind: "$products"
             },
@@ -45,21 +45,21 @@ class CartsController{
         return {result: result, count:count};
     }
 
-    static async deleteCartById(id){
-        return await cartsModel.updateOne({_id:cid},{$set:{products:[]}});
+    static deleteCartById(id){
+        return CartsServices.update({_id:cid},{$set:{products:[]}});
     }
 
-    static async updateCartById(id, products){
-        return await cartsModel.updateOne({_id:id},{$push:{products:{$each:products}}});
+    static updateCartById(id, products){
+        return CartsServices.update({_id:id},{$push:{products:{$each:products}}});
     }
 
-    static async deleteProductFromCart(cid, pid){
-        return await cartsModel.updateOne({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
+    static deleteProductFromCart(cid, pid){
+        return CartsServices.update({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
     }
 
-    static async updateCartProductQty(cid, pid, qty){
+    static updateCartProductQty(cid, pid, qty){
         //remove all products with pid
-        const resultRemove = await cartsModel.updateOne({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
+        const resultRemove = CartsServices.update({_id:cid},{$pullAll:{ products:[{_id:pid}]}});
         if(!resultRemove) return {error: "Error on remove"};
         //set array of pid products by given number
         const productArray = [];
@@ -67,7 +67,7 @@ class CartsController{
             productArray.push({_id:pid});
         }
         //insert each product to products array
-        const result = await cartsModel.updateOne({_id:cid},{$push:{products: {$each:productArray}}});
+        const result = CartsServices.update({_id:cid},{$push:{products: {$each:productArray}}});
         return {result: result};
     }
 }
