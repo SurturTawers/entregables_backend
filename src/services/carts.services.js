@@ -1,21 +1,23 @@
-import cartsModel from '../db/models/carts.js';
+import {cartRepository,ticketRepository} from '../repositories/index.js';
 
 export default class CartsServices{
     static create(){
-        return cartsModel.create({products:[]});
+        return cartRepository.create([]);
     }
+
     static getById(id, populate){
-        if(populate){
-            return cartsModel.findOne({_id:id}).populate(populate); 
-        }
-        return cartsModel.findOne({_id:id});
+        return cartRepository.getById(id,populate); 
     }
-    
+
     static aggregate(aggregation){
-        return cartsModel.aggregate(aggregation);
+        return cartRepository.aggregate(aggregation);
     }
 
     static update(filter, query){
-        return cartsModel.updateOne(filter,query);
+        return cartRepository.update(filter,query);
+    }
+
+    static purchase(purchaseInfo){
+        return ticketRepository.create(purchaseInfo);
     }
 }

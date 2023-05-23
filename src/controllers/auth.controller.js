@@ -5,7 +5,7 @@ class AuthController{
     static async register(email, password){
         if(!email || !password) return {fieldError: "Faltan campos"};
         try{
-            let user = await UsersServices.get({email});
+            let user = await UsersServices.get(email);
             if(user) return {userExists: true};
             user = UsersServices.create({
                 email,
@@ -20,7 +20,7 @@ class AuthController{
     static async login(email,password){
         if(!email || !password) return {fieldError: "Faltan campos"};
         try{
-            const user = await UsersServices.get({email});
+            const user = await UsersServices.get(email);
             if(!user) return {userExists: false};
             if(!validatePassword(password,user)) return {validatePswdError: true};
             return {user:user};

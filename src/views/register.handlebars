@@ -4,31 +4,10 @@
 {{/if}}
 <form id="registerForm" action="/register" method="post">
     <label for="userEmail">Correo electrónico</label>
-    <input id="userEmail" type="email" placeholder="Correo">
+    <input id="userEmail" type="email" placeholder="Correo" required>
     <label for="userPassword">Contraseña</label>
-    <input id="userPassword" type="password" placeholder="contraseña">
+    <input id="userPassword" type="password" placeholder="contraseña" required>
     <button type="submit">Registrarse</button>
     <a href="/login">Iniciar sesión</a>
 </form>
-
-<script>
-    document.getElementById('registerForm').addEventListener('submit', function(event){
-        event.preventDefault();
-        fetch('http://localhost:8080/register', {
-            method: "POST",
-            body: JSON.stringify({
-                email: event.target.userEmail.value,
-                password: event.target.userPassword.value,
-            }),
-            headers: {
-                "Content-type": "application/json",
-            }
-        })
-        .then(()=>{
-            alert('Success');
-            window.location = "http://localhost:8080/login";
-        }).catch(err=>{
-            alert(err);
-        });
-    })
-</script>
+<script src="js/register.js"></script>

@@ -1,4 +1,5 @@
 import CartsServices from "../services/carts.services.js";
+import ProductsServices from "../services/products.services.js";
 
 class CartsController{
     static async createCart(){
@@ -74,6 +75,60 @@ class CartsController{
         //insert each product to products array
         const result = await CartsServices.update({_id:cid},{$push:{products: {$each:productArray}}});
         return {result: result};
+    }
+
+    static async cartPurchase(cid, user){
+        const products = await CartsServices.aggregate([
+            {//desenvuelve el array
+                $unwind: "$products"
+            },
+            {//agrupa por id y los cuenta
+                $group: {
+                    _id: "$products",
+                    count: {
+                        $sum: 1
+                    }
+                }
+            },
+            {//obtengo el producto por grupo
+                $lookup:{
+                    from: 'products',
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "productInfo"
+                }
+            },
+            {//desenvuelvo el array de info 
+                $unwind: "$productInfo"
+            },
+            { //obtengo los campos que necesito
+                $project: {
+                    "_id": 1,
+                    "count": 1,
+                    "productInfo.price":1,
+                    "productInfo.stock":1,
+                }
+            }
+        ]);
+        //console.log(products);
+        let total = 0;
+        const finalProducts = [];
+        products.forEach(product => {
+            console.log(product);
+            if(product.count <= product.productInfo.stock){
+                finalProducts.push(product);
+                total += product.productInfo.price * product.count;
+            }
+        });
+        console.log(finalProducts, total, user);
+        const result = CartsServices.purchase({amount:total, purchaser: user});
+        //if the ticket has been created, update stock and delete purchased products
+        let newStock;
+        finalProducts.forEach(product => {
+            newStock = product.productInfo.stock - product.count;
+            ProductsServices.update(product._id, newStock);
+            this.deleteProductFromCart(cid,product._id);
+        });
     }
 }
 

@@ -15,11 +15,11 @@ viewsRouter.get('/home',auth,(req,res)=>{
 });
 
 viewsRouter.get('/login',(req,res)=>{
-    res.render('login');
+    res.render('login',{layout:'auth'});
 });
 
 viewsRouter.get('/register',(req,res)=>{
-    res.render('register')
+    res.render('register',{layout:'auth'})
 });
 
 viewsRouter.post('/register', passport.authenticate('register',{failureRedirect:'/register'}),(req,res)=>{
@@ -45,21 +45,21 @@ viewsRouter.post('/logout',(req,res)=>{
     }
 });
 
-viewsRouter.get('/products',async (req,res)=>{
+viewsRouter.get('/products', auth, async (req,res)=>{
     const {query: {limit, page, sort, query}} = req;
-    const {responseData, pagRes} = ProductsController.getProducts(limit,page,sort,query);
+    const {responseData, pagRes} = await ProductsController.getProducts(limit,page,sort,query);
     res.render('products',{pageInfo: responseData, productos:responseData.payload.map(doc => doc.toJSON()),length:pagRes.totalDocs, usuario: req.session.user, rol: req.session.role});
 });
 
-viewsRouter.get('/products/:pid',async (req,res)=>{
+viewsRouter.get('/products/:pid',auth,async (req,res)=>{
     const {params: {pid}} = req;
-    const result = ProductsController.getProductById(pid);
-    res.render('productDetail',{product:result.toJSON()});
+    const result = await ProductsController.getProductById(pid);
+    res.render('productDetail',{product: result?result.toJSON():null});
 });
 
-viewsRouter.get('/carts/:cid',async (req,res)=>{
+viewsRouter.get('/carts/:cid',auth,async (req,res)=>{
     const {params: {cid}} = req;
-    const {result, count} = CartsController.cartCheckout(cid);
+    const {result, count} = await CartsController.cartCheckout(cid);
     res.render('cart',{cart:result.toJSON(), products: count});
 });
 

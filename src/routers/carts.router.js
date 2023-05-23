@@ -5,28 +5,28 @@ const cartsRouter = Router();
 
 //crea un carrito
 cartsRouter.post('/',async (req,res)=>{
-    const result = CartsController.createCart();
+    const result = await CartsController.createCart();
     result ? res.status(200).json(result) : res.status(400).json("Error");
 });
 
 //mostrar carrito, con populate
 cartsRouter.get('/:cid',async (req,res)=>{
     const {params: {cid}} = req;
-    const result = CartsController.showCartById(cid);
+    const result = await CartsController.showCartById(cid);
     result ? res.status(200).json(result): res.status(400).json("No se encontró");
 });
 
 //borrar carrito
 cartsRouter.delete('/:cid',async (req,res)=>{
     const {params: {cid}} = req;
-    const result = CartsController.deleteCartById(cid);
+    const result = await CartsController.deleteCartById(cid);
     result ? res.status(200).json(result): res.status(400).json("Error");
 });
 //actualizar el carrito con array de productos
 cartsRouter.put('/:cid',async (req,res)=>{
     const {params: {cid}, body} = req;
     //update with products array
-    const result = CartsController.updateCartById(cid, body);
+    const result = await CartsController.updateCartById(cid, body);
     result ? res.status(200).json(result): res.status(400).json("Error");
 });
 /*
@@ -41,17 +41,23 @@ cartsRouter.post('/:cid/products/:pid',async(req,res)=>{
 cartsRouter.delete('/:cid/products/:pid',async(req,res)=>{
     const {params: {cid, pid}} = req;
     //remove all products with pid
-    const result = CartsController.deleteProductFromCart(cid,pid);
+    const result = await CartsController.deleteProductFromCart(cid,pid);
     result ? res.status(200).json(result): res.status(400).json("Error");
 });
 
 //actualizar solo la cantidad de ejemplares
 cartsRouter.put('/:cid/products/:pid',async(req,res)=>{
     const {params: {cid, pid}, body} = req;
-    const {result, error} = CartsController.updateCartProductQty(cid,pid,body.quantity);
+    const {result, error} = await CartsController.updateCartProductQty(cid,pid,body.quantity);
     error 
         ? res.status(400).json("Error on update: ", error) 
         : (result ? res.status(200).json(result) : null);
+});
+
+cartsRouter.post('/:cid/purchase', async(req,res)=>{
+    const {params: {cid}} = req;
+    const result = await CartsController.cartPurchase(cid, req.session.user);
+    result ? res.status(200).json(result): res.status(400).json("Error");
 });
 
 export default cartsRouter;

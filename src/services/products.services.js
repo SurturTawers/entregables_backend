@@ -1,23 +1,23 @@
-import productsModel from '../db/models/products.js';
+import { productRepository } from "../repositories/index.js";
 
 export default class ProductsServices{
+    static create(product){
+        return productRepository.create(product);
+    }
+
     static getAll(limit,page,sort,query){
-        return productsModel.paginate(query?{query}:{},{limit:limit?limit:10,page:page?page:1,sort:sort?sort:0});
+        return productRepository.getAll(limit,page,sort,query);
     }
 
     static getById(id){
-        return productsModel.findOne({_id:id});
-    }
-
-    static create(product){
-        return productsModel.create(product);
+        return productRepository.getById(id);
     }
 
     static update(id,fields){
-        return productsModel.updateOne({_id:id},{$set:fields});
+        return productRepository.update(id,fields);
     }
 
     static delete(id){
-        return productsModel.deleteOne({_id:id});
+        return productRepository.delete(id);
     }
 }

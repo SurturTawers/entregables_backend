@@ -1,8 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import {Strategy as GithubStrategy} from 'passport-github2';
-import { createHash, validatePassword } from "../utils/passwordEncrypt.js";
-import UserModel from '../db/models/users.js';
+import UserModel from '../models/users.js';
 import config from "./config.js";
 import AuthController from "../controllers/auth.controller.js";
 
@@ -23,7 +22,7 @@ export const initPassport = ()=>{
         const {fieldError, userExists, user, error} = await AuthController.register(email,password);
         if(fieldError) return done(new Error(fieldError));
         if(error) return done(new Error(error));
-        if(userExists) return done(null,false);
+        if(userExists) return done(new Error("Usuario ya existe"));
         if(user) return done(null,user);
     }));
 

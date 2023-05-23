@@ -1,11 +1,11 @@
-import UserModel from '../db/models/users.js';
+import { userRepository } from "../repositories/index.js";
 
 export default class UsersServices{
-    static get(query){
-        return UserModel.findOne(query);
+    static create(user){
+        return userRepository.create(user);
     }
 
-    static create(user){
-        return UserModel.create(user);
+    static get(email){
+        return userRepository.get(email);
     }
 }

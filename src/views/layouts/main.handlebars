@@ -10,6 +10,26 @@
         <!-- <link rel ="stylesheet" href="css/{{style}}"> -->
     </head>
     <body>
-        {{{body}}}   
+        <nav>
+            <ul class="space-between">
+                <li><a href="http://localhost:8080/home">Home</a></li>
+                <li><a href="http://localhost:8080/products">Productos</a></li>
+                <li><a href="http://localhost:8080/carts/6425b9604ef1c4fb279426f3">Carrito</a></li>
+                <li><a onclick="logout();">Logout</a></li>
+            </ul>
+        </nav>
+        {{{body}}}
+        <script>
+            function logout(){
+                fetch('http://localhost:8080/logout', {
+                    method: "POST",
+                })
+                .then((res)=>{
+                    window.location = 'http://localhost:8080/login';
+                }).catch(err=>{
+                    alert(err);
+                });
+            }
+        </script>
     </body>
 </html>
