@@ -4,6 +4,8 @@ import ProductsController from "../controllers/products.controller.js";
 import CartsController from "../controllers/carts.controller.js";
 import auth from '../middlewares/user-auth.middleware.js';
 import AuthController from "../controllers/auth.controller.js";
+import {generateProduct} from '../utils/mocks/product.js';
+
 const viewsRouter = Router();
 
 viewsRouter.get('/',(req,res)=>{
@@ -61,6 +63,15 @@ viewsRouter.get('/carts/:cid',auth,async (req,res)=>{
     const {params: {cid}} = req;
     const {result, count} = await CartsController.cartCheckout(cid);
     res.render('cart',{cart:result.toJSON(), products: count});
+});
+
+viewsRouter.get('/mockingproducts',(req,res)=>{
+    const mockedProducts = []
+    for(let i =0; i<100 ; i++){
+        mockedProducts.push(generateProduct());
+    }
+    //res.status(200).json({productos:mockedProducts});
+    res.render('productsmock', {productos: mockedProducts, length:1})
 });
 
 export default viewsRouter;
