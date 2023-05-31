@@ -25,8 +25,13 @@ class ProductsController{
             const result = await ProductsServices.create(product);
             return {result: result};
         }catch(error){
-            console.log(error);
-            return {error: error};
+            //console.log(error);
+            return {error: CustomError.createError({
+                name: "DB Error",
+                cause: "Connection error",
+                message: error.message,
+                code: CustomErrorTypes.DATABASE_ERR
+            })};
         };
     }
 
