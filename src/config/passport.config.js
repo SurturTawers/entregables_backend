@@ -20,23 +20,38 @@ export const initPassport = ()=>{
     passport.use('register',new LocalStrategy(options,async(req,email,password,done)=>{
         //console.log(req);
         const {fieldError, userExists, user, error} = await AuthController.register(email,password);
-        if(fieldError) return done(new Error(fieldError));
-        if(error) return done(new Error(error));
+        if(fieldError) {
+            req.logger.warning(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`);
+            return done(new Error(fieldError));
+        }
+        if(error) {
+            req.logger.error(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`);
+            return done(new Error(error))
+        };
         if(userExists) return done(new Error("Usuario ya existe"));
         if(user) return done(null,user);
     }));
 
     passport.use('login', new LocalStrategy(options, async (req,email,password,done)=>{
         const {fieldError, userExists, validatePswdError, user, error} = await AuthController.login(email,password);
-        if(fieldError) return done(new Error(fieldError));
-        if(error) return done(new Error(error));
+        if(fieldError) {
+            req.logger.warning(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`);
+            return done(new Error(fieldError));
+        }
+        if(error){
+            req.logger.error(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`); 
+            return done(new Error(error));
+        }
         if(userExists===false|| validatePswdError) return done(null,false);
         if(user) return done(null,user);
     }));
 
     passport.use('github', new GithubStrategy(githubOptions,async (access_token, refreshToken,profile,done)=>{
         const {error,user} = await AuthController.githubLogin(profile);
-        if(error) return done(new Error(error));
+        if(error) {
+            req.logger.error(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`);
+            return done(new Error(error));
+        }
         if(user) return done(null,user);
     }));
 

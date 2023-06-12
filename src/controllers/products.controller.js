@@ -1,4 +1,6 @@
 import ProductsServices from '../services/products.services.js';
+import CustomError from '../utils/errors/CustomError.js';
+import CustomErrorTypes from '../utils/errors/CustomErrorTypes.js';
 class ProductsController{
     static async getProducts(limit, page, sort, query){
         const pagRes = await ProductsServices.getAll(limit,page,sort,query);
@@ -25,7 +27,7 @@ class ProductsController{
             const result = await ProductsServices.create(product);
             return {result: result};
         }catch(error){
-            //console.log(error);
+            //console.log(error.message);
             return {error: CustomError.createError({
                 name: "DB Error",
                 cause: "Connection error",
