@@ -9,6 +9,7 @@ import {initPassport} from './config/passport.config.js';
 import __dirname from "./utils.js";
 import config from './config/config.js';
 import { addLogger } from './utils/logger.js';
+
 //db init
 await init();
 const app = express(); 

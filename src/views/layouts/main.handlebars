@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
-        <title>Titulo</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-        <!-- <link rel ="stylesheet" href="css/{{style}}"> -->
-    </head>
-    <body>
-        <nav>
-            <ul class="space-between">
-                <li><a href="http://localhost:8080/home">Home</a></li>
-                <li><a href="http://localhost:8080/products">Productos</a></li>
-                <li><a href="http://localhost:8080/carts/6425b9604ef1c4fb279426f3">Carrito</a></li>
-                <li><a onclick="logout();">Logout</a></li>
-            </ul>
-        </nav>
-        {{{body}}}
-        <script>
-            function logout(){
-                fetch('http://localhost:8080/logout', {
-                    method: "POST",
-                })
-                .then((res)=>{
-                    window.location = 'http://localhost:8080/login';
-                }).catch(err=>{
-                    alert(err);
-                });
-            }
-        </script>
-    </body>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <title>Titulo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <!-- <link rel ="stylesheet" href="css/{{style}}"> -->
+</head>
+<body>
+<nav>
+    <ul class="space-between">
+        <li><a href="http://localhost:8080/home">Home</a></li>
+        <li><a href="http://localhost:8080/products">Productos</a></li>
+        <li><a href="http://localhost:8080/carts/6425b9604ef1c4fb279426f3">Carrito</a></li>
+        <li><a onclick="logout();">Logout</a></li>
+    </ul>
+</nav>
+{{{body}}}
+<script>
+    function logout() {
+        fetch('http://localhost:8080/api/logout', {
+            method: "POST",
+        })
+        .then((res) => {
+            window.location = 'http://localhost:8080/login';
+        }).catch(err => {
+            alert(err);
+        });
+    }
+</script>
+</body>
 </html>

@@ -15,9 +15,9 @@ export default class Product{
     }
 
     getById(id){
-        return this.dao.getById(id);
+        const product = this.dao.getById(id);
+        return product ? product : {};
     }
-
 
     update(id,fields){
         return this.dao.update(id,fields);

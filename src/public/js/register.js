@@ -1,6 +1,6 @@
-document.getElementById('registerForm').addEventListener('submit', function(event){
+document.getElementById('registerForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    fetch('http://localhost:8080/register', {
+    fetch('http://localhost:8080/api/register', {
         method: "POST",
         body: JSON.stringify({
             email: event.target.userEmail.value,
@@ -9,11 +9,10 @@ document.getElementById('registerForm').addEventListener('submit', function(even
         headers: {
             "Content-type": "application/json",
         }
-    })
-    .then(()=>{
+    }).then(() => {
         alert('Success');
         window.location = "http://localhost:8080/login";
-    }).catch(err=>{
+    }).catch(err => {
         alert(err);
     });
 });
