@@ -1,0 +1,262 @@
+paths:
+  /api/carts:
+    post:
+      summary: Crea un carrito vacío
+      tags:
+        - Carts
+      responses:
+        200:
+          description: Creado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Error en creación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/dbError'
+
+  /api/carts/{cid}:
+    get:
+      summary: Muestra un carrito dado su id
+      tags:
+        - Carts
+      parameters:
+        - $ref: '#/components/parameters/cartIdParam'
+      responses:
+        200:
+          description: Carrito obtenido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+              example:
+                _id: 17ash384287akjf123
+                products: [_id: 17ash384287akjf123,  _id: 17ash384287akjf123]
+                createdAt: "2023-08-04T02:35:11.315Z"
+                updatedAt: "2023-08-04T02:35:11.315Z"
+
+        400:
+          description: Error de id o de DB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+    delete:
+      summary: Elimina un carro dado su id
+      tags:
+        - Carts
+      parameters:
+        - $ref: '#/components/parameters/cartIdParam'
+      responses:
+        200:
+          description: Eliminado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: No encontrado o error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+    put:
+      summary: Actualiza los productos de un carrito dado su id
+      tags:
+        - Carts
+      parameters:
+        - $ref: '#/components/parameters/cartIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/updateCartById'
+      responses:
+        200:
+          description: Actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: No encontrado o error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+  /api/carts/{cid}/products/{pid}:
+    delete:
+      summary: Elimina el producto de un carrito dado el id de carrito y id de producto
+      tags:
+        - Carts
+      parameters:
+        - $ref: '#/components/parameters/cartIdParam'
+        - $ref: '#/components/parameters/productIdParam'
+      responses:
+        200:
+          description: Eliminado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: No encontrado o error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+    put:
+      summary: Actualiza la cantidad de un producto en un carrito dado el id de carrito y id de producto
+      tags:
+        - Carts
+      parameters:
+        - $ref: '#/components/parameters/cartIdParam'
+        - $ref: '#/components/parameters/productIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/updateCartProductQty'
+      responses:
+        200:
+          description: Actualizado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: No encontrado o error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Realiza la compra de los productos de un carrito según el stock
+      tags:
+        - Carts
+      parameters:
+        - $ref: '#/components/parameters/cartIdParam'
+      responses:
+        200:
+          description: Compra realizada correctamente e ingresada en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Error en creación de ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+components:
+  parameters:
+    cartIdParam:
+      name: cid
+      in: path
+      required: true
+      description: id del carrito (MongoDB _id)
+      schema:
+        $type: string
+
+    productIdParam:
+        name: pid
+        in: path
+        required: true
+        description: id del producto a actualizar (MongoDB _id)
+        schema:
+          $type: string
+
+  requestBodies:
+    updateCartProductQty:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: Cantidad de un producto a actualizar
+      example:
+        quantity: 12
+
+    updateCartById:
+      type: array
+      items:
+        type: string
+        description: id de producto
+      example:
+        value: ['6426320661e0d37beb74ba94', '6426320661e0d37beb74ba94']
+
+  schemas:
+    Cart:
+      description: Carrito de compra
+      type: object
+      properties:
+        _id:
+          type: string
+          description: MongoDB id del carrito
+        products:
+          type: array
+          items:
+            type: string
+            description: MongoDB id del producto
+        createdAt:
+          description: Timestamp creado en
+          type: string
+          format: date-time
+        updatedAt:
+          description: Timestamp actualizado en
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensaje describiendo el tipo de error
+        message:
+          type: string
+          description: Mensaje del error
+
+  examples:
+    invalidMongoId:
+      summary: Id enviado no es válido para MongoDB
+      value:
+        error: Invalid MongoId
+        message: It's not a valid mongoId
+    dbError:
+      summary: Error al consultar con la DB
+      value:
+        error: 'DB error: Connection refused - Code: 123'
+        message: Database unavailable

@@ -1,0 +1,181 @@
+paths:
+  /api/products/:
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Products
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          description: limite de productos a obtener
+          schema:
+            $type: integer
+        - in: query
+          name: page
+          required: false
+          description: número de página
+          schema:
+            $type: integer
+        - in: query
+          name: sort
+          required: false
+          description: Ordenamiento ascendente o descente
+          schema:
+            $type: integer
+        - in: query
+          name: query
+          required: false
+          description: Query en MongoDB
+          schema:
+            $type: string
+      responses:
+        200:
+          description: Productos obtenidos correctamente en DB
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/PaginatedProducts'
+        400:
+          description: Error al obtener
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/dbError'
+
+    post:
+      summary: Crea un nuevo producto
+      tags:
+        - Products
+      requestBody:
+        - $ref: '#/components/requestBodies/createProductBody'
+      responses:
+        200:
+          description: Producto creado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Error al crear
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/dbError'
+
+  /api/products/{pid}:
+    get:
+      summary: Obtiene un producto dado su id
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/productIdParam'
+      responses:
+        200:
+          description: Producto obtenido correctamente en DB
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/Product'
+        400:
+          description: Error al obtener
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+    put:
+      summary: Actualiza las propiedades de un producto dado su id
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/productIdParam'
+      requestBody:
+        - $ref: '#/components/requestBodies/updateProductByIdBody'
+      responses:
+        200:
+          description: Producto actualizado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Error al actualizar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+    delete:
+      summary: Elimina un producto dado su id
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/productIdParam'
+      responses:
+        200:
+          description: Producto eliminado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: string
+                value: Eliminado correctamente
+        400:
+          description: Error al eliminar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+
+components:
+  parameters:
+    productIdParam:
+      name: pid
+      in: path
+      required: true
+      description: id del producto (MongoDB _id)
+      schema:
+        $type: string
+
+  schemas:
+    PaginatedProducts:
+
+    Product:
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensaje describiendo el tipo de error
+        message:
+          type: string
+          description: Mensaje del error
+
+  examples:
+    invalidMongoId:
+      summary: Id enviado no es válido para MongoDB
+      value:
+        error: Invalid MongoId
+        message: It's not a valid mongoId
+
+    dbError:
+      summary: Error al consultar con la DB
+      value:
+        error: 'DB error: Connection refused - Code: 123'
+        message: Database unavailable
+

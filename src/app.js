@@ -1,18 +1,36 @@
 import express from 'express';
-import passport from 'passport';
 import handlebars from "express-handlebars";
-import expressSession from 'express-session';
-import router from './routers/index.router.js';
-import MongoStore from 'connect-mongo';
-import {init} from './db/mongoose.js'
-import {initPassport} from './config/passport.config.js';
 import __dirname from "./utils.js";
 import config from './config/config.js';
+import router from './routers/index.router.js';
+import passport from 'passport';
+import {initPassport} from './config/passport.config.js';
+import expressSession from 'express-session';
+import MongoStore from 'connect-mongo';
+import {init} from './db/mongoose.js'
 import { addLogger } from './utils/logger.js';
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerui from 'swagger-ui-express';
 
-//db init
+// SWAGGER OPTIONS
+const swaggerOptions = {
+    definition: {
+        openapi:'3.0.1',
+        info: {
+            title: 'SurturTawers E-Commerce API',
+            description: 'Proyecto final del curso de programación backend en Coderhouse'
+        },
+    },
+    apis: [`${__dirname}/docs/**/*.yaml`],
+};
+const specs = swaggerJsDoc(swaggerOptions);
+
+// DB INIT
 await init();
-const app = express(); 
+
+const app = express();
+
+// HANDLEBARS INIT
 app.engine('handlebars',handlebars.engine({
     layoutsDir: __dirname+"/views/layouts",
     defaultLayout:'main'
@@ -20,11 +38,13 @@ app.engine('handlebars',handlebars.engine({
 app.set('view engine','handlebars');
 app.set('views',__dirname+'/views');
 
+// MIDDLEWARES
 app.use(addLogger);
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(express.static(__dirname+'/public'));
 
+// EXPRESS SESSIONS WITH MONGO
 app.use(expressSession({
     store: MongoStore.create({
         mongoUrl: config.mongoUrl,
@@ -39,12 +59,16 @@ app.use(expressSession({
     saveUninitialized: true //permite guardar aunque no se haya guardado info de sesion
 }));
 
+// PASSPORT INIT
 initPassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
+// ROUTERS INIT
 app.use('/',router);
+app.use('/api-docs', swaggerui.serve, swaggerui.setup(specs));
 
+// SERVER INIT
 const server = app.listen(config.port || 8080, ()=>{
     console.log("Listening on http://localhost:" + config.port || 8080);
 })
