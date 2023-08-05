@@ -8,13 +8,13 @@ productsRouter.get('/',ProductsController.getProducts, (req,res, mensaji)=>{
     res.status(200).json(res.locals.data);
 });
 
+//crear producto
+productsRouter.post('/',ProductsController.createProduct);
+
 //obtener producto por pid
 productsRouter.get('/:pid',ProductsController.getProductById, (req,res)=>{
     res.status(200).json(res.locals.result);
 });
-
-//crear producto
-productsRouter.post('/',ProductsController.createProduct);
 
 //actualizar producto por pid
 productsRouter.put('/:pid',ProductsController.updateProductById);

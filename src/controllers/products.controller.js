@@ -34,6 +34,20 @@ class ProductsController{
         }
     }
 
+    static async createProduct(req,res){
+        const {body} = req;
+        try{
+            const {result, error }= await ProductsServices.create(body);
+            req.logger.warning(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`);
+            error ? res.status(503).json(error) : res.status(200).json(result);
+        }catch(error){
+            res.status(400).json({
+                error: `DB error: ${error.name} - Code: ${error.code}` ,
+                message: error.message
+            });
+        };
+    }
+
     static async getProductById(req, res, next){
         const {params: {pid}} = req;
         const {isValid, error, message} = isValidMongoId(pid);
@@ -56,20 +70,6 @@ class ProductsController{
                 message: error.message
             });
         }
-    }
-
-    static async createProduct(req,res){
-        const {body} = req;
-        try{
-            const {result, error }= await ProductsServices.create(body);
-            req.logger.warning(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`);
-            error ? res.status(503).json(error) : res.status(200).json(result);
-        }catch(error){
-            res.status(400).json({
-                error: `DB error: ${error.name} - Code: ${error.code}` ,
-                message: error.message
-            });
-        };
     }
 
     static async updateProductById(req, res){
