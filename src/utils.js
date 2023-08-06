@@ -3,24 +3,26 @@ import { dirname } from "path";
 import jsonwebtoken from 'jsonwebtoken';
 import config from './config/config.js';
 
-const tokenGenerator = (user)=>{
+export const jwtTokenGenerator = (user)=>{
     const payload = {
         email: user.email,
-        name: user.name
+        role: 'user'
     }
     const token = jsonwebtoken.sign(payload, config.jwtSecret, {expiresIn: '24h'});
+    console.log(token);
     return token;
 }
 
-export const isValidToken = (token)=>{
-    jsonwebtoken.verify(token, config.jwtSecret, (err, credentials)=>{
-        if(err){
-            return resolve(false);
-        }else{
-            return resolve(true);
-        }
+export const isValidJwtToken = (token)=>{
+    return new Promise((resolve)=>{
+        jsonwebtoken.verify(token, config.jwtSecret, (error, payload)=>{
+            if(error){
+                return resolve(false);
+            }
+           return resolve(true);
+        });
+        return token;
     });
-    return token;
 }
 
 export const isValidMongoId = (id) =>{

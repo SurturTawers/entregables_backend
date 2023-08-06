@@ -10,6 +10,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             "Content-Type": "application/json",
         }
     }).then((res) => {
+        //console.log('yupi');
         window.location = 'http://localhost:8080/home';
     }).catch(err => {
         alert(err);
