@@ -196,6 +196,8 @@ class CartsController{
                     }
                 }
             ]);
+            res.locals.data = {result: result, count:count};
+            next();
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
@@ -203,8 +205,6 @@ class CartsController{
                 message: error.message
             });
         }
-        res.locals.data = {result: result, count:count};
-        next();
     }
 
     static async cartPurchase(req, res) {

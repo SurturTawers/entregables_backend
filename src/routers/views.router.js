@@ -1,7 +1,6 @@
 import {Router} from "express";
 import ProductsController from "../controllers/products.controller.js";
 import CartsController from "../controllers/carts.controller.js";
-//import authRoleMiddleware from '../middlewares/user-auth.middleware.js';
 import {generateProduct} from '../utils/mocks/product.js';
 import JWTAuthMiddleware from "../middlewares/jwt-auth.middleware.js";
 
@@ -19,11 +18,15 @@ viewsRouter.get('/register', (req, res) => {
     res.render('register', {layout: 'auth'})
 });
 
-viewsRouter.get('/home', JWTAuthMiddleware, (req, res) => {
+viewsRouter.get('/admin/register', (req, res) => {
+    res.render('admin-register', {layout: 'auth'})
+})
+
+viewsRouter.get('/home', JWTAuthMiddleware('jwt'), (req, res) => {
     res.render('home');
 });
 
-viewsRouter.get('/products', JWTAuthMiddleware, ProductsController.getProducts, (req, res) => {
+viewsRouter.get('/products', JWTAuthMiddleware('jwt'), ProductsController.getProducts, (req, res) => {
     const {responseData, pagRes} = res.locals.data;
     res.render('products', {
         pageInfo: responseData,
@@ -34,12 +37,12 @@ viewsRouter.get('/products', JWTAuthMiddleware, ProductsController.getProducts, 
     });
 });
 
-viewsRouter.get('/products/:pid', JWTAuthMiddleware, ProductsController.getProductById, (req, res) => {
+viewsRouter.get('/products/:pid', JWTAuthMiddleware('jwt'), ProductsController.getProductById, (req, res) => {
     const result = res.locals.result;
     res.render('productDetail', {product: result ? result.toJSON() : null});
 });
 
-viewsRouter.get('/carts/:cid', JWTAuthMiddleware, CartsController.cartCheckout, (req, res) => {
+viewsRouter.get('/carts/:cid', JWTAuthMiddleware('jwt'), CartsController.cartCheckout, (req, res) => {
     const {result, count} = res.locals.data;
     res.render('cart', {cart: result.toJSON(), products: count});
 });
@@ -49,7 +52,6 @@ viewsRouter.get('/mockingproducts', (req, res) => {
     for (let i = 0; i < 100; i++) {
         mockedProducts.push(generateProduct());
     }
-    //res.status(200).json({productos:mockedProducts});
     res.render('productsmock', {productos: mockedProducts, length: 1})
 });
 

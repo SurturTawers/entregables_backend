@@ -2,12 +2,13 @@
 {{#if error }}
     <p>{{error}}</p>
 {{/if}}
-<form id="registerForm" action="/register" method="post">
+<form id="registerForm" method="post">
     <label for="userEmail">Correo electrónico</label>
     <input id="userEmail" type="email" placeholder="Correo" required>
     <label for="userPassword">Contraseña</label>
     <input id="userPassword" type="password" placeholder="contraseña" required>
     <button type="submit">Registrarse</button>
+    <div id="registerErrors"></div>
     <a href="/login">Iniciar sesión</a>
 </form>
 <script src="js/register.js"></script>

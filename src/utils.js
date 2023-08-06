@@ -6,10 +6,9 @@ import config from './config/config.js';
 export const jwtTokenGenerator = (user)=>{
     const payload = {
         email: user.email,
-        role: 'user'
+        role: user.role
     }
     const token = jsonwebtoken.sign(payload, config.jwtSecret, {expiresIn: '24h'});
-    console.log(token);
     return token;
 }
 

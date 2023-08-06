@@ -25,7 +25,7 @@ export const initPassport = () => {
     }
 
     passport.use('jwt', new JWTStrategy({
-        _jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
         secretOrKey: config.jwtSecret
     }, (payload, done) => {
         return done(null, payload);
@@ -38,9 +38,9 @@ export const initPassport = () => {
     passport.use('github', new GithubStrategy(githubOptions, AuthController.githubLogin));
 
     passport.serializeUser((user, done) => {
-        //console.log(user);
         done(null, user._id);
     });
+
     passport.deserializeUser(async (id, done) => {
         const user = await UserModel.findById(id);
         done(null, user);

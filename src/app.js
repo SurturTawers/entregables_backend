@@ -5,8 +5,8 @@ import config from './config/config.js';
 import router from './routers/index.router.js';
 import passport from 'passport';
 import {initPassport} from './config/passport.config.js';
-//import expressSession from 'express-session';
-//import MongoStore from 'connect-mongo';
+import expressSession from 'express-session';
+import MongoStore from 'connect-mongo';
 import {init} from './db/mongoose.js'
 import { addLogger } from './utils/logger.js';
 import swaggerJsDoc from 'swagger-jsdoc';
@@ -47,7 +47,6 @@ app.use(express.static(__dirname+'/public'));
 app.use(cookieParser());
 
 // EXPRESS SESSIONS WITH MONGO
-/*
 app.use(expressSession({
     store: MongoStore.create({
         mongoUrl: config.mongoUrl,
@@ -61,11 +60,11 @@ app.use(expressSession({
     resave: true, //mantiene activa la sesion
     saveUninitialized: true //permite guardar aunque no se haya guardado info de sesion
 }));
-/**/
+
 // PASSPORT INIT
 initPassport();
 app.use(passport.initialize());
-//app.use(passport.session());
+app.use(passport.session());
 
 // ROUTERS INIT
 app.use('/',router);
