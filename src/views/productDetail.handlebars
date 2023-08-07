@@ -7,9 +7,11 @@
     <p><b>Status:</b> {{product.status}}</p>
     <p><b>Stock:</b> {{product.stock}}</p>
     <p><b>Category:</b> {{product.category}}</p>
-    <button type="button" onclick="submitProduct(document.getElementById('{{product._id}}').id)">
-        Agregar al carrito
-    </button>
+    {{#if product.stock}}
+        <button type="button" onclick="submitProduct(document.getElementById('{{product._id}}').id)">
+            Agregar al carrito
+        </button>
+    {{/if}}
 </div>
 
 <script>

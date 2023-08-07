@@ -1,7 +1,7 @@
 import CartsServices from "../services/carts.services.js";
 import ProductsServices from "../services/products.services.js";
 import {isValidMongoId} from "../utils.js";
-import mongoose from "mongoose";
+
 import {
     findCartById,
     getProductInfoByGroup,
@@ -232,13 +232,21 @@ class CartsController{
                 obtenerCamposRequeridosCheckout
             ]);
             console.log(total, products);
-            const result = CartsServices.purchase({amount: total, purchaser: req.user.email});
+            const ticketPayload = [];
+            products.forEach((product)=>{
+                ticketPayload.push({
+                    id_producto: product._id,
+                    cantidad: product.count,
+                    subtotal: product.count * product.productInfo.price
+                })
+            })
+            const result = CartsServices.purchase({total: total, purchaser: req.user.email, items: ticketPayload});
             //if the ticket has been created, update stock and delete purchased products
             let newStock;
             //TEST THIS
             for (let product of products) {
                 newStock = product.productInfo.stock - product.count;
-                console.log(newStock);
+                //console.log(newStock);
                 try {
                     await ProductsServices.update(product._id, {
                         stock: newStock,

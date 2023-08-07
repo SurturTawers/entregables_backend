@@ -58,5 +58,6 @@ export const obtenerCamposRequeridosCheckout = {
         "count": 1,
         "productInfo.price": 1,
         "productInfo.stock": 1,
+        "productInfo.title": 1
     }
 }

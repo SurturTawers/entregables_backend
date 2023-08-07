@@ -3,6 +3,7 @@ import JWTAuthMiddleware from "../middlewares/jwt-auth.middleware.js";
 import authRoleMiddleware from "../middlewares/user-auth.middleware.js";
 import ProductsController from "../controllers/products.controller.js";
 import CartsController from "../controllers/carts.controller.js";
+import TicketsController from "../controllers/tickets.controller.js";
 import {generateProduct} from '../utils/mocks/product.js';
 
 const viewsRouter = Router();
@@ -84,23 +85,35 @@ viewsRouter.get('/cart/checkout', JWTAuthMiddleware('jwt'), CartsController.cart
     }
 });
 
-/*
-viewsRouter.get('/purchases', JWTAuthMiddleware('jwt'), TicketController.getTickets, (req, res) => {
-    const {tickets} = res.locals.data
-    res.render('purchases', {
-        tickets: tickets,
-        layout: req.user.role === 'admin' ? 'admin-main' : 'main'
-    });
+viewsRouter.get('/purchases', JWTAuthMiddleware('jwt'), TicketsController.getTickets, (req, res) => {
+    const {tickets, message} = res.locals.data;
+    if(tickets){
+        res.render('purchases', {
+            tickets: tickets,
+            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        });
+    }else{
+        res.render('purchases', {
+            message: message,
+            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        });
+    }
 });
 
-viewsRouter.get('/ticket/{tid}', JWTAuthMiddleware('jwt'), TicketController.showTicket, (req, res) => {
-    const {ticket} = res.locals.data
-    res.render('purchase-ticket', {
-        ticket: ticket,
-        layout: req.user.role === 'admin' ? 'admin-main' : 'main'
-    });
+viewsRouter.get('/ticket/:tid', JWTAuthMiddleware('jwt'), TicketsController.getTicketById, (req, res) => {
+    const {ticket, message} = res.locals.data
+    if(ticket){
+        res.render('purchase-ticket', {
+            ticket: ticket.toJSON(),
+            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        });
+    }else{
+        res.render('purchase-ticket', {
+            message: message,
+            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        });
+    }
 });
-*/
 
 viewsRouter.get('/mockingproducts', JWTAuthMiddleware('jwt'), authRoleMiddleware('admin'), (req, res) => {
     const mockedProducts = []

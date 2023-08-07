@@ -1,0 +1,15 @@
+<h1>Mis compras</h1>
+{{#if tickets}}
+    {{#each tickets}}
+        <div id="{{id}}" style="background-color:lightblue; text-align:center">
+            <p>Ticket {{id}}</p>
+            <p>Total: {{total}}</p>
+            <button id="detailButton" onclick="window.location='http://localhost:8080/ticket/{{id}}'">
+                Ver detalle
+            </button>
+        </div>
+    {{/each}}
+{{else}}
+    <h4>{{message}}</h4>
+{{/if}}
+

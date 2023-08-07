@@ -6,8 +6,10 @@
                 <h3>{{title}}  </h3>
                 <p><b>ID:</b> {{_id}}</p>
             </a>
-            <button type="button" onclick="submitProduct(document.getElementById('{{_id}}').id)">Agregar al carrito
-            </button>
+            {{#if stock}}
+                <button type="button" onclick="submitProduct(document.getElementById('{{_id}}').id)">Agregar al carrito
+                </button>
+            {{/if}}
         </div>
     {{/each}}
     <p align="justify">
