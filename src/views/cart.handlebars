@@ -1,11 +1,67 @@
 <h1 style="text-align:center;">Carrito {{cart._id}}</h1>
+<p id="removeMsg"></p>
 {{#each products}}
-    <form action="api/carts/{{cart._id}}/products/{{_id}}" method="delete">
-        <div id="{{_id}}" style="background-color:lightblue; text-align:center" >
+    <form id="removeProductForm">
+        <input id="product_id" type="hidden" value="{{_id}}">
+        <input id="cart_id" type="hidden" value="{{../cart._id}}">
+        <input id="{{_id}}_prod_qty" type="hidden" value="{{count}}">
+        <div id="{{_id}}" style="background-color:lightblue; text-align:center">
             <p>{{productInfo.title}}</p>
             <p>ID: {{_id}}</p>
-            <p>Cantidad: {{count}}</p>
-            <!--<button type="submit">remove from cart</button>-->
+            <p id="{{_id}}_qty">Cantidad: {{count}}</p>
+            <div style="display: flex">
+                <button id="quitarUnoButton" type="submit">Quitar uno</button>
+                <button id="quitarTodosButton" type="submit">Quitar del carrito</button>
+            </div>
         </div>
     </form>
 {{/each}}
+{{#if products}}
+    <div>
+        <button type="button" onclick="window.location = 'http://localhost:8080/cart/checkout'">Pagar</button>
+    </div>
+{{else}}
+    <span>No hay productos en su carrito</span>
+{{/if}}
+<script>
+    document.getElementById('removeProductForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const remMsg = document.getElementById(`removeMsg`);
+        const pid = event.target.product_id.value;
+        const cid = event.target.cart_id.value;
+        const qty = document.getElementById(`${pid}_prod_qty`);
+        const prod_qty = document.getElementById(`${pid}_qty`);
+        fetch(`http://localhost:8080/api/carts/${cid}/products/${pid}`, {
+            method: event.submitter.id === 'quitarUnoButton' && qty.value > 0 ? "PUT" : "DELETE",
+            body: JSON.stringify({
+                quantity: qty.value - 1
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then((res) => {
+            if (res.ok) {
+                remMsg.innerText = "Producto quitado correctamente";
+                remMsg.style = "color: green";
+                if (qty.value > 0 && event.submitter.id === 'quitarUnoButton') {
+                    qty.value -= 1;
+                    prod_qty.innerText = `Cantidad: ${qty.value}`;
+                }else if(event.submitter.id === 'quitarTodosButton'){
+                    qty.value = 0;
+                    prod_qty.innerText = `Cantidad: ${qty.value}`;
+                }
+            } else {
+                return res.json();
+            }
+        }).then((data) => {
+            const {success, error, message} = data;
+            if (!success || error) {
+                remMsg.innerText = message;
+                remMsg.style = "color:red";
+            }
+        }).catch((error) => {
+            console.log(error);
+        });
+        /**/
+    });
+</script>

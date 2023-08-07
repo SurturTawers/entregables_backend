@@ -2,7 +2,7 @@ import cartsModel from '../models/carts.js';
 
 export default class Cart{
     create(products){
-        return cartsModel.create({products: products});
+        return cartsModel.create(products);
     }
 
     getById(id,populate){

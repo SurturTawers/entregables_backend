@@ -3,5 +3,6 @@ export default class UserDTO{
         this.email= user.email;
         this.password = user.password;
         this.role = user.role;
+        this.carrito = user.carrito;
     }
 }

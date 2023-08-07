@@ -1,5 +1,6 @@
 import {Router} from "express";
 import CartsController from "../controllers/carts.controller.js";
+import JWTAuthMiddleware from "../middlewares/jwt-auth.middleware.js";
 
 const cartsRouter = Router();
 
@@ -13,7 +14,7 @@ cartsRouter.get('/:cid', CartsController.showCartById);
 cartsRouter.delete('/:cid', CartsController.deleteCartById);
 
 //actualizar el carrito con array de productos
-cartsRouter.put('/:cid', CartsController.updateCartById);
+cartsRouter.put('/',JWTAuthMiddleware('jwt'), CartsController.updateCartById);
 
 /*
 //insertar producto o productos en carrito
@@ -24,11 +25,11 @@ cartsRouter.post('/:cid/products/:pid',async(req,res)=>{
 });
 /**/
 //eliminar producto del carrito
-cartsRouter.delete('/:cid/products/:pid', CartsController.deleteProductFromCart);
+cartsRouter.delete('/:cid/products/:pid', JWTAuthMiddleware('jwt'), CartsController.deleteProductFromCart);
 
 //actualizar solo la cantidad de ejemplares
-cartsRouter.put('/:cid/products/:pid', CartsController.updateCartProductQty);
+cartsRouter.put('/:cid/products/:pid',JWTAuthMiddleware('jwt'), CartsController.updateCartProductQty);
 
-cartsRouter.post('/:cid/purchase', CartsController.cartPurchase);
+cartsRouter.post('/:cid/purchase',JWTAuthMiddleware('jwt'), CartsController.cartPurchase);
 
 export default cartsRouter;

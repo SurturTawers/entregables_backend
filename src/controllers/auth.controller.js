@@ -3,6 +3,7 @@ import CustomError from '../utils/errors/CustomError.js';
 import CustomErrorTypes from '../utils/errors/CustomErrorTypes.js';
 import {createHash, validatePassword} from '../utils/passwordEncrypt.js';
 import config from "../config/config.js";
+import CartsServices from "../services/carts.services.js";
 
 class AuthController {
     static async register(req, email, password, done) {
@@ -12,13 +13,16 @@ class AuthController {
         try {
             let user = await UsersServices.get(email);
             if (user) return done(null, false, {message: 'Usuario ya existe', userExists: true});
+            let carritoUser = await CartsServices.create();
             user = await UsersServices.create({
                 email,
                 password: createHash(password),
-                role: role
+                role: role,
+                carrito: carritoUser._id
             });
             return done(null, user);
         } catch (error) {
+            console.log(error);
             return done(new Error({
                 error: CustomError.createError({
                     name: "DB Error",

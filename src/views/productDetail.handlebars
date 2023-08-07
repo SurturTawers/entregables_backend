@@ -16,14 +16,14 @@
     function submitProduct(id) {
         const ids = [];
         ids.push(id);
-        fetch('http://localhost:8080/api/carts/6425b9604ef1c4fb279426f3', {
+        fetch('http://localhost:8080/api/carts', {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(ids)
         }).then(() => {
-            alert("Agregado correctamente en carrito 6425b9604ef1c4fb279426f3")
+            alert("Agregado correctamente en carrito")
         });/**/
     }
 </script>

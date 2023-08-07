@@ -32,7 +32,7 @@ usersRouter.post('/register', function (req, res, next) {
 });
 
 usersRouter.post('/login', function (req, res, next) {
-    passport.authenticate('register', function (error, user, info) {
+    passport.authenticate('login', function (error, user, info) {
         if (user) {
             req.user = user;
             return next();

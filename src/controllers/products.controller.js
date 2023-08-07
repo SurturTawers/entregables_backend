@@ -1,9 +1,7 @@
 import ProductsServices from '../services/products.services.js';
-import CustomError from '../utils/errors/CustomError.js';
-import CustomErrorTypes from '../utils/errors/CustomErrorTypes.js';
 import {isValidMongoId} from "../utils.js";
-import {logger} from "../utils/logger.js";
-class ProductsController{
+
+class ProductsController {
     static async getProducts(req, res, next) {
         const {query: {limit, page, sort, query}} = req;
         try {
@@ -24,7 +22,7 @@ class ProductsController{
                     },
                     pagRes: pagRes
                 }
-                : res.locals.data = {message:"Sin resultados"};
+                : res.locals.data = {message: "Sin resultados"};
             next();
         } catch (error) {
             res.status(400).json({
@@ -34,21 +32,24 @@ class ProductsController{
         }
     }
 
-    static async createProduct(req,res){
+    static async createProduct(req, res) {
         const {body} = req;
-        try{
-            const {result, error }= await ProductsServices.create(body);
-            req.logger.warning(`${req.method} on ${req.url} at ${error.date}-> ${error.code} ${error.name}, ${error.cause}, ${error}`);
+        try {
+            console.log(body);
+            const {result, error} = await ProductsServices.create(body);
+            console.log(`Result: ${result}\nError: ${error}`);
             error ? res.status(503).json(error) : res.status(200).json(result);
-        }catch(error){
+        } catch (error) {
+            console.log(error.code);
             res.status(400).json({
-                error: `DB error: ${error.name} - Code: ${error.code}` ,
+                error: `DB error: ${error.name} - Code: ${error.code}`,
+                errorCode: error.code,
                 message: error.message
             });
-        };
+        }
     }
 
-    static async getProductById(req, res, next){
+    static async getProductById(req, res, next) {
         const {params: {pid}} = req;
         const {isValid, error, message} = isValidMongoId(pid);
         //logger.info(`${isValid}, ${error}, ${message}`);
@@ -59,20 +60,20 @@ class ProductsController{
             });
         }
 
-        try{
+        try {
             const result = await ProductsServices.getById(pid);
             result ? res.locals.result = result : res.status(400).json("No se encontró");
             next();
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
-                error: `DB error: ${error.name} - Code: ${error.code}` ,
+                error: `DB error: ${error.name} - Code: ${error.code}`,
                 message: error.message
             });
         }
     }
 
-    static async updateProductById(req, res){
+    static async updateProductById(req, res) {
         const {params: {pid}, body} = req;
         const {isValid, error, message} = isValidMongoId(pid);
         //logger.info(`${isValid}, ${error}, ${message}`);
@@ -88,13 +89,13 @@ class ProductsController{
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
-                error: `DB error: ${error.name} - Code: ${error.code}` ,
+                error: `DB error: ${error.name} - Code: ${error.code}`,
                 message: error.message
             });
         }
     }
 
-    static async deleteProductById(req,res){
+    static async deleteProductById(req, res) {
         const {params: {pid}} = req;
         const {isValid, error, message} = isValidMongoId(pid);
         //logger.info(`${isValid}, ${error}, ${message}`);
@@ -110,7 +111,7 @@ class ProductsController{
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
-                error: `DB error: ${error.name} - Code: ${error.code}` ,
+                error: `DB error: ${error.name} - Code: ${error.code}`,
                 message: error.message
             });
         }

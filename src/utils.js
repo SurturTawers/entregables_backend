@@ -6,7 +6,8 @@ import config from './config/config.js';
 export const jwtTokenGenerator = (user)=>{
     const payload = {
         email: user.email,
-        role: user.role
+        role: user.role,
+        carrito: user.carrito
     }
     const token = jsonwebtoken.sign(payload, config.jwtSecret, {expiresIn: '24h'});
     return token;
