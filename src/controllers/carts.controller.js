@@ -1,5 +1,6 @@
 import CartsServices from "../services/carts.services.js";
 import ProductsServices from "../services/products.services.js";
+import PaymentServices from "../services/payment.services.js";
 import {isValidMongoId} from "../utils.js";
 
 import {
@@ -12,22 +13,21 @@ import {
     unwindProductInfo
 } from "../utils/cart_aggregations.js";
 
-class CartsController{
-    static async createCart(req,res){
-        try{
+class CartsController {
+    static async createCart(req, res) {
+        try {
             const result = await CartsServices.create();
             result ? res.status(200).json(result) : res.status(400).json("Error");
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
-                error: `DB error: ${error.name} - Code: ${error.code}` ,
+                error: `DB error: ${error.name} - Code: ${error.code}`,
                 message: error.message
             });
         }
     }
 
-    static async showCartById(req,res,next){
-        //const {params: {cid}} = req;
+    static async showCartById(req, res, next) {
         const cid = req.user.carrito;
         const {isValid, error, message} = isValidMongoId(cid);
         if (error || !isValid) {
@@ -47,11 +47,9 @@ class CartsController{
                 unwindProductInfo,
                 obtenerCamposRequeridosShowCart
             ]);
-            console.log(count);
-            res.locals.data = {result: cart, count:count};
+            res.locals.data = {result: cart, count: count};
             next();
         } catch (error) {
-            //console.log(error.message);
             res.status(400).json({
                 error: `DB error: ${error.name} - Code: ${error.code}`,
                 message: error.message
@@ -72,7 +70,7 @@ class CartsController{
 
         try {
             const result = await CartsServices.update({_id: cid}, {$set: {products: []}});
-            result ? res.status(200).json(result): res.status(400).json("Error");
+            result ? res.status(200).json(result) : res.status(400).json("Error");
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
@@ -120,7 +118,10 @@ class CartsController{
 
         try {
             const result = await CartsServices.update({_id: cid}, {$pullAll: {products: [{_id: pid}]}});
-            result ? res.status(200).json(result) : res.status(400).json({message: "Error al actualizar, intentelo nuevamente: ", error: error});
+            result ? res.status(200).json(result) : res.status(400).json({
+                message: "Error al actualizar, intentelo nuevamente: ",
+                error: error
+            });
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
@@ -155,7 +156,10 @@ class CartsController{
 
             //insert each product to products array
             const result = await CartsServices.update({_id: cid}, {$push: {products: {$each: productArray}}});
-            result ? res.status(200).json(result) : res.status(400).json({message: "Error al actualizar, intentelo nuevamente: ", error: error});
+            result ? res.status(200).json(result) : res.status(400).json({
+                message: "Error al actualizar, intentelo nuevamente: ",
+                error: error
+            });
         } catch (error) {
             //console.log(error.message);
             res.status(400).json({
@@ -165,7 +169,7 @@ class CartsController{
         }
     }
 
-    static async cartCheckout(req,res,next){
+    static async cartCheckout(req, res, next) {
         //const {params: {cid}} = req;
         const cid = req.user.carrito;
         const {isValid, error, message} = isValidMongoId(cid);
@@ -193,15 +197,33 @@ class CartsController{
                 if (product.count <= product.productInfo.stock) {
                     finalProducts.push(product);
                     total += product.productInfo.price * product.count;
-                }else{
+                } else {
                     leftover.push(product);
                 }
             });
             //console.log(finalProducts, total, req.user);
-            if(finalProducts.length === 0){
-                res.locals.data = {success:false, message: "No hay stock para ningún producto en su carrito"};
-            }else{
-                res.locals.data = {success:true, cartId: req.user.carrito, products: finalProducts, leftover: leftover, total:total};
+            if (finalProducts.length === 0) {
+                res.locals.data = {success: false, message: "No hay stock para ningún producto en su carrito"};
+            } else {
+                let data;
+                const service = new PaymentServices();
+                const stripeCustomer = await service.getCustomer(req.user.email);
+                if (stripeCustomer.data.length === 0) {
+                    const newCustomer = await service.createCustomer({email: req.user.email});
+                    console.log("New customer\n", newCustomer);
+                    data = {amount: total, customer: newCustomer.data[0].id, currency: 'clp'};
+                } else {
+                    data = {amount: total, customer: stripeCustomer.data[0].id, currency: 'clp'};
+                }
+                const paymentIntent = await service.createPaymentIntent(data);
+                res.locals.data = {
+                    success: true,
+                    cartId: req.user.carrito,
+                    products: finalProducts,
+                    leftover: leftover,
+                    total: total,
+                    intent: paymentIntent
+                };
             }
             return next();
         } catch (error) {
@@ -213,8 +235,8 @@ class CartsController{
         }
     }
 
-    static async cartPurchase(req, res) {
-        const {params: {cid}, body: {total}} = req;
+    static async cartPurchase(req, res, next) {
+        const {params: {cid}} = req;
         const {isValid, error, message} = isValidMongoId(cid);
         if (error || !isValid) {
             res.status(400).json({
@@ -231,16 +253,71 @@ class CartsController{
                 unwindProductInfo,
                 obtenerCamposRequeridosCheckout
             ]);
-            console.log(total, products);
+            const sessionProducts = [];
+            products.forEach((product) => {
+                sessionProducts.push({
+                    price_data: {
+                        currency: "clp",
+                        product_data: {
+                            name: `${product._id}`
+                        },
+                        unit_amount: product.productInfo.price,
+                    },
+                    quantity: product.count
+                });
+            });
+            const service = new PaymentServices();
+            const session = await service.createSession({
+                line_items: sessionProducts,
+                mode: 'payment',
+                success_url: `http://localhost:8080/api/carts/create-ticket/${cid}`,
+                cancel_url: 'http://localhost:8080/cart/checkout'
+            });
+            res.locals.sessionurl = session.url;
+            next();
+            //res.redirect(303,"http://localhost:8080/");
+        } catch (error) {
+            //console.log(error.message);
+            res.status(400).json({
+                error: `DB error: ${error.name} - Code: ${error.code}`,
+                message: error.message
+            });
+        }
+    }
+
+    static async createTicket(req, res) {
+        const {params: {cid}} = req;
+        const {isValid, error, message} = isValidMongoId(cid);
+        if (error || !isValid) {
+            res.status(400).json({
+                error: 'Invalid MongoId',
+                message: message
+            });
+        }
+        try {
+            const products = await CartsServices.aggregate([
+                findCartById(cid),
+                unwindCartProducts,
+                groupProductsById,
+                getProductInfoByGroup,
+                unwindProductInfo,
+                obtenerCamposRequeridosCheckout
+            ]);
             const ticketPayload = [];
-            products.forEach((product)=>{
+            let total = 0;
+            products.forEach((product) => {
+                total += product.count * product.productInfo.price;
                 ticketPayload.push({
                     id_producto: product._id,
                     cantidad: product.count,
                     subtotal: product.count * product.productInfo.price
-                })
-            })
-            const result = CartsServices.purchase({total: total, purchaser: req.user.email, items: ticketPayload});
+                });
+            });
+            const result = await CartsServices.purchase({
+                total: total,
+                purchaser: req.user.email,
+                items: ticketPayload
+            });
             //if the ticket has been created, update stock and delete purchased products
             let newStock;
             //TEST THIS
@@ -261,15 +338,14 @@ class CartsController{
                 }
                 const result = await CartsServices.update({_id: cid}, {$pullAll: {products: [{_id: product._id}]}});
             }
-            res.status(200).json({success: true});
-            /**/
+            res.redirect(303, `http://localhost:8080/ticket/${result._id}`);
         } catch (error) {
-            //console.log(error.message);
             res.status(400).json({
                 error: `DB error: ${error.name} - Code: ${error.code}`,
                 message: error.message
             });
         }
+        /**/
     }
 }
 

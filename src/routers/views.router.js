@@ -66,7 +66,7 @@ viewsRouter.get('/cart', JWTAuthMiddleware('jwt'), CartsController.showCartById,
 });
 
 viewsRouter.get('/cart/checkout', JWTAuthMiddleware('jwt'), CartsController.cartCheckout, (req, res) => {
-    const {success, message, cartId, products, leftover, total} = res.locals.data;
+    const {success, message, cartId, products, leftover, total, intent} = res.locals.data;
     if(!success){
         res.render('cart-summary',{
             success: success,
@@ -80,6 +80,7 @@ viewsRouter.get('/cart/checkout', JWTAuthMiddleware('jwt'), CartsController.cart
             products: products,
             leftover: leftover,
             total: total,
+            client_secret: intent.client_secret,
             layout: req.user.role === 'admin' ? 'admin-main' : 'main'
         });
     }

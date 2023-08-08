@@ -14,7 +14,7 @@ cartsRouter.get('/:cid', CartsController.showCartById);
 cartsRouter.delete('/:cid', CartsController.deleteCartById);
 
 //actualizar el carrito con array de productos
-cartsRouter.put('/',JWTAuthMiddleware('jwt'), CartsController.updateCartById);
+cartsRouter.put('/', JWTAuthMiddleware('jwt'), CartsController.updateCartById);
 
 /*
 //insertar producto o productos en carrito
@@ -28,8 +28,11 @@ cartsRouter.post('/:cid/products/:pid',async(req,res)=>{
 cartsRouter.delete('/:cid/products/:pid', JWTAuthMiddleware('jwt'), CartsController.deleteProductFromCart);
 
 //actualizar solo la cantidad de ejemplares
-cartsRouter.put('/:cid/products/:pid',JWTAuthMiddleware('jwt'), CartsController.updateCartProductQty);
+cartsRouter.put('/:cid/products/:pid', JWTAuthMiddleware('jwt'), CartsController.updateCartProductQty);
 
-cartsRouter.post('/:cid/purchase',JWTAuthMiddleware('jwt'), CartsController.cartPurchase);
+cartsRouter.post('/:cid/purchase', JWTAuthMiddleware('jwt'), CartsController.cartPurchase, (req, res) => {
+    res.status(200).json({sessionUrl: res.locals.sessionurl});
+});
 
+cartsRouter.get('/create-ticket/:cid', JWTAuthMiddleware('jwt'), CartsController.createTicket);
 export default cartsRouter;

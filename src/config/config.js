@@ -10,5 +10,7 @@ export default {
     githubClientID: process.env.GITHUB_CLIENT_ID,
     githubSecret: process.env.GITHUB_CLIENT_SECRET,
     jwtSecret: process.env.JWT_SECRET,
-    adminSecret: process.env.ADMIN_SECRET
+    adminSecret: process.env.ADMIN_SECRET,
+    stripePublishable: process.env.STRIPE_PUBLISHABLE_KEY,
+    stripeSecret: process.env.STRIPE_SECRET_KEY
 }
