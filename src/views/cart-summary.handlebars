@@ -1,0 +1,61 @@
+<h1 style="text-align:center;"> Resumen de pedido</h1>
+{{#if success}}
+    {{#each products}}
+        <form action="api/carts/{{../cart_id}}/products/{{_id}}" method="delete">
+            <div id="{{_id}}" style="background-color:lightblue; text-align:center">
+                <p>{{productInfo.title}}</p>
+                <p>ID: {{_id}}</p>
+                <p>Cantidad: {{count}}</p>
+                <!--<button type="submit">remove from cart</button>-->
+            </div>
+        </form>
+    {{/each}}
+
+    {{#if leftover}}
+        <h3>Productos no disponibles</h3>
+        {{#each leftover}}
+            <form action="api/carts/{{../cart_id}}/products/{{_id}}" method="delete">
+                <div id="{{_id}}" style="background-color:lightblue; text-align:center">
+                    <p>{{productInfo.title}}</p>
+                    <p>ID: {{_id}}</p>
+                    <p>Cantidad: {{count}}</p>
+                    <!--<button type="submit">remove from cart</button>-->
+                </div>
+            </form>
+        {{/each}}
+    {{/if}}
+    <div>
+        <button type="button" onclick="purchase(`{{cart_id}}`, `{{total}}`)">Pagar
+            $ {{total}}</button>
+        <span id="errorMessage"></span>
+    </div>
+{{else}}
+    <span style="color: red">{{message}}</span>
+{{/if}}
+
+<script>
+    function purchase(cartId, total) {
+        fetch(`http://localhost:8080/api/carts/${cartId}/purchase`, {
+            method: "POST",
+            body: JSON.stringify({
+                total: total,
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then((res) => {
+            return res.json();
+        }).then((data) => {
+            const {sessionUrl, message} = data;
+            if(sessionUrl){
+                window.location = sessionUrl;
+            }else{
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.innerText = data.message;
+                errorMsg.style = "color:red";
+            }
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+</script>

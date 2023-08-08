@@ -1,0 +1,16 @@
+{{#if ticket}}
+    <div id="{{ticket._id}}" style="background-color:lightblue; text-align:center">
+        <h2>Ticket: {{ticket._id}}</h2>
+        {{#each ticket.items}}
+            <div style="border: solid; ">
+                <p><b>Producto: </b> {{id_producto.title}}</p>
+                <p><b>Cantidad: </b> {{cantidad}}</p>
+                <p><b>Subtotal: </b> ${{subtotal}}</p>
+            </div>
+        {{/each}}
+        <p><b>Total: </b> ${{ticket.total}}</p>
+    </div>
+
+{{else}}
+    <h1>{{message}}</h1>
+{{/if}}

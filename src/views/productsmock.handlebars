@@ -1,0 +1,14 @@
+{{#if length}}
+    <h1 style="text-align:center;">Productos</h1>
+    {{#each productos}}
+        <div id="{{id}}" style="background-color:lightblue; text-align:center" >
+            <a href="#" style="text-decoration:none; color:black">
+                <h3>{{title}}  </h3>
+                <p><b>ID:</b> {{id}}</p>
+            </a>
+            <button>Agregar al carrito</button>
+        </div>
+    {{/each}}
+{{else}}
+    <h1 style="text-align:center;">No hay productos</h1>
+{{/if}}

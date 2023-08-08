@@ -1,0 +1,55 @@
+<div id="{{product._id}}" style="background-color:lightblue; text-align:center">
+    <h2>{{product.title}}</h2>
+    <h3>ID: {{product._id}}</h3>
+    <p><b>Description:</b> {{product.description}}</p>
+    <p><b>Codigo:</b> {{product.code}}</p>
+    <p><b>Precio:</b> {{product.price}}</p>
+    <p><b>Status:</b> {{product.status}}</p>
+    <p><b>Stock:</b> {{product.stock}}</p>
+    <p><b>Category:</b> {{product.category}}</p>
+    {{#if product.stock}}
+        <div>
+
+            <button type="button" onclick="submitProduct(document.getElementById('{{product._id}}').id)">
+                Agregar al carrito
+            </button>
+            {{#if isAdminOrPremium}}
+                <button type="button" onclick="deleteProduct(`{{product._id}}`)">
+                    Eliminar producto
+                </button>
+            {{/if}}
+        </div>
+    {{/if}}
+</div>
+
+<script>
+    function submitProduct(id) {
+        const ids = [];
+        ids.push(id);
+        fetch('http://localhost:8080/api/carts', {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(ids)
+        }).then(() => {
+            alert("Agregado correctamente en carrito")
+        });/**/
+    }
+
+    function deleteProduct(pid) {
+        fetch(`http://localhost:8080/api/products/${pid}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then((res) => {
+            return res.json();
+        }).then((data) => {
+            alert("Eliminado correctamente");
+            console.log(data.message);
+        }).catch((err) => {
+            console.log(err);
+        });/**/
+    }
+</script>

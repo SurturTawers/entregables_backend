@@ -1,0 +1,459 @@
+paths:
+  /api/products/:
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/queryQueryParam'
+      responses:
+        200:
+          description: Productos obtenidos correctamente en DB
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/PaginatedProducts'
+              examples:
+                - $ref: '#/components/examples/PaginatedProductsResult'
+        400:
+          description: Error al obtener
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/dbError'
+
+    post:
+      summary: Crea un nuevo producto
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/createProductBody'
+      responses:
+        200:
+          description: Producto creado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Error al crear
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/dbError'
+                - $ref: '#/components/examples/duplicateKeyError'
+
+  /api/products/{pid}:
+    get:
+      summary: Obtiene un producto dado su id
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/productIdParam'
+      responses:
+        200:
+          description: Producto obtenido correctamente en DB
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/Product'
+              examples:
+                - $ref: '#/components/examples/FoundProduct'
+        400:
+          description: Error al obtener
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+    put:
+      summary: Actualiza las propiedades de un producto dado su id
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/productIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/updateProductByIdBody'
+      responses:
+        200:
+          description: Producto actualizado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Error al actualizar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+    delete:
+      summary: Elimina un producto dado su id
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/productIdParam'
+      responses:
+        200:
+          description: Producto eliminado correctamente en DB
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Error al eliminar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                - $ref: '#/components/examples/invalidMongoId'
+                - $ref: '#/components/examples/dbError'
+
+components:
+  parameters:
+    productIdParam:
+      name: pid
+      in: path
+      required: true
+      description: id del producto (MongoDB _id)
+      schema:
+        $type: string
+    limitQueryParam:
+      in: query
+      name: limit
+      required: false
+      description: Límite de productos a obtener
+      schema:
+        $type: integer
+    pageQueryParam:
+      in: query
+      name: page
+      required: false
+      description: Número de página
+      schema:
+        $type: integer
+    sortQueryParam:
+      in: query
+      name: sort
+      required: false
+      description: Ordenamiento ascendente o descente
+      schema:
+        $type: integer
+    queryQueryParam:
+      in: query
+      name: query
+      required: false
+      description: Query en MongoDB
+      schema:
+        $type: string
+
+  schemas:
+    PaginatedProducts:
+      type: object
+      properties:
+        responseData:
+          type: object
+          properties:
+            status:
+              type: string
+              description: Estado de la ejecución
+            payload:
+              type: array
+              description: Arreglo de productos obtenidos
+              items:
+                $ref: '#/components/schemas/Product'
+            totalPages:
+              type: integer
+              description: Número total de páginas
+            prevPage:
+              type: integer
+              description: Número de página anterior
+            nextPage:
+              type: integer
+              description: Número de página siguiente
+            page:
+              type: integer
+              description: Número de página actual
+            hasPrevPage:
+              type: boolean
+              description: Si existe una página anterior a la actual
+            hasNextPage:
+              type: boolean
+              description: Si existe una página siguiente a la actual
+            prevLink:
+              type: string
+              description: URL que lleva a la página de datos anterior
+            nextLink:
+              type: string
+              description: URL que lleva a la página de datos siguiente
+        pagRes:
+          $ref: '#/components/schemas/PagRes'
+
+    PagRes:
+      type: object
+      description: Objeto resultante de la consulta a la DB
+      properties:
+        docs:
+          type: array
+          description: Arreglo de productos obtenidos
+          items:
+            $ref: '#/components/schemas/Product'
+        totalDocs:
+          type: integer
+          description: Número total de objetos obtenidos de la DB
+        limit:
+          type: integer
+          description: Límite de elementos obtenidos
+        totalPages:
+          type: integer
+          description: Número total de páginas creadas
+        page:
+          type: integer
+          description: Número de página actual
+        pagingCounter:
+          type: integer
+          description:
+        hasPrevPage:
+          type: boolean
+          description: Si existe una página anterior
+        hasNextPage:
+          type: boolean
+          description: Si existe una página siguiente
+        prevPage:
+          type: integer
+          description: Número de página anterior
+        nextPage:
+          type: integer
+          description: Número de página siguiente
+
+    Product:
+      type: object
+      description: Producto almacenado en la DB
+      properties:
+        _id:
+          type: string
+          description: Identificador único de MongoDB
+        title:
+          type: string
+          description: Nombre del producto
+        descripcion:
+          type: string
+          description: Descripción del producto
+        code:
+          type: string
+          description: Código identificador único del producto
+        price:
+          type: integer
+          description: Valor del producto
+        status:
+          type: boolean
+          description: Si el producto está disponible
+        stock:
+          type: integer
+          description: Cantidad de este producto en stock
+        category:
+          type: string
+          description: Categoría del producto
+        thumbnails:
+          type: array
+          description: Arreglo de rutas a imágenes de este producto
+          items:
+            type: string
+            description: ruta o URL a la imagen
+        createdAt:
+          description: Timestamp creado en
+          type: string
+          format: date-time
+        updatedAt:
+          description: Timestamp actualizado en
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensaje describiendo el tipo de error
+        message:
+          type: string
+          description: Mensaje del error
+
+  requestBodies:
+    createProductBody:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        descripcion:
+          type: string
+          description: Descripción del producto
+        code:
+          type: string
+          description: Código identificador único del producto
+        price:
+          type: integer
+          description: Precio del producto por unidad
+        stock:
+          type: integer
+          description: Cantidad de producto
+        category:
+          type: string
+          description: Categoría del producto
+        thumbnails:
+          type: array
+          description: Arreglo de rutas o URLs a las imágenes del producto
+      required:
+        - title
+        - descripcion
+        - code
+        - price
+        - stock
+        - category
+      example:
+        title: "Producto de Prueba"
+        description: "este es un producto de prueba"
+        code: "ab11b11bc111111211113"
+        price: 2500
+        stock: 10
+        category: "Testing"
+        thumbnails: ["asd","asd","asd"]
+
+    updateProductByIdBody:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        descripcion:
+          type: string
+          description: Descripción del producto
+        code:
+          type: string
+          description: Código identificador único del producto
+        price:
+          type: integer
+          description: Precio del producto por unidad
+        stock:
+          type: integer
+          description: Cantidad de producto
+        category:
+          type: string
+          description: Categoría del producto
+        thumbnails:
+          type: array
+          description: Arreglo de rutas o URLs a las imágenes del producto
+      example:
+        title: "Producto de Prueba actualizado"
+        description: "este es un producto de prueba actualizado"
+        code: "ab11b11bc111111211113"
+        stock: 10
+        category: "Testing"
+
+  examples:
+    invalidMongoId:
+      summary: Id enviado no es válido para MongoDB
+      value:
+        error: Invalid MongoId
+        message: It's not a valid mongoId
+
+    dbError:
+      summary: Error al consultar con la DB
+      value:
+        error: 'DB error: Connection refused - Code: 123'
+        message: Database unavailable
+
+    duplicateKeyError:
+      summary: Error al insertar un nuevo producto
+      value:
+        error: "DB error: MongoServerError - Code: 11000"
+        message: "E11000 duplicate key error collection: test.products index: code_1 dup key: { code: \"ab11b11bc111111211113\" }"
+
+    PaginatedProductsResult:
+      summary: Productos obtenidos en la consulta paginada
+      value:
+        PaginatedProducts:
+          status: "ok"
+          payload: [{
+            _id: "64259d39fb07a04a5775cc83",
+            title: "Producto de Prueba",
+            description: "este es un producto de prueba",
+            code: "abc123",
+            price: 2500,
+            status: true,
+            stock: 10,
+            category: "Testing",
+          }]
+          totalPages: 2
+          prevPage: null
+          nextPage: 2
+          page: 1
+          hasPrevPage: false
+          hasNextPage: true
+          prevLink: null
+          nextLink: "http://localhost:8080/api/products?limit=10&page=2&null&null"
+        pagRes:
+          docs: [{
+            _id: "64259d39fb07a04a5775cc83",
+            title: "Producto de Prueba",
+            description: "este es un producto de prueba",
+            code: "abc123",
+            price: 2500,
+            status: true,
+            stock: 10,
+            category: "Testing",
+          }]
+          totalDocs: 10
+          limit: 10
+          totalPages: 2
+          page: 1
+          pagingCounter: 1
+          hasPrevPage: false
+          hasNextPage: true
+          prevPage: null
+          nextPage: 2
+
+    FoundProduct:
+      summary: Producto encontrado por id
+      value: {
+        "_id": "64259d39fb07a04a5775cc83",
+        "title": "Producto de Prueba",
+        "description": "este es un producto de prueba",
+        "code": "abc123",
+        "price": 2500,
+        "status": true,
+        "stock": 10,
+        "category": "Testing",
+        "thumbnails": [
+          "asd",
+          "asd",
+          "asd"
+        ],
+        "createdAt": "2023-03-30T14:31:21.314Z",
+        "updatedAt": "2023-03-30T14:31:21.314Z",
+        "__v": 0
+      }

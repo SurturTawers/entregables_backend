@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <title>Titulo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <!-- <link rel ="stylesheet" href="css/{{style}}"> -->
+</head>
+<body>
+<nav>
+    <ul id="linksList" class="space-between">
+        <li><a href="http://localhost:8080/home">Home</a></li>
+        <li><a href="http://localhost:8080/products">Productos</a></li>
+        <li><a href="http://localhost:8080/cart">Carrito</a></li>
+        <li><a href="http://localhost:8080/purchases">Mis compras</a></li>
+        <li><a href="http://localhost:8080/mockingproducts/">Products mock</a></li>
+        <li><a href="http://localhost:8080/new-product">Crear Producto</a></li>
+        <li><a href="http://localhost:8080/api">Usuarios</a></li>
+        <li><a class="button" onclick="clearUsers()">Clear users</a></li>
+        <li><a  href="#" onclick="logout();return false;">Logout</a></li>
+    </ul>
+</nav>
+{{{body}}}
+</body>
+<script src="/js/logout.js"></script>
+<script>
+    function clearUsers(){
+        fetch("http://localhost:8080/api",{
+            method:"DELETE"
+        }).then((res)=>{
+          return res.json();
+        }).then((data)=>{
+            const {error, message, result} = data;
+            if(error){
+                console.log(error, message);
+            }else{
+                alert(message);
+                console.log(result);
+            }
+        }).catch((err)=>{
+            console.log(err);
+        });
+    }
+</script>
+</html>
