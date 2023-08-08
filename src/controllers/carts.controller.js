@@ -270,8 +270,8 @@ class CartsController {
             const session = await service.createSession({
                 line_items: sessionProducts,
                 mode: 'payment',
-                success_url: `http://localhost:8080/api/carts/create-ticket/${cid}`,
-                cancel_url: 'http://localhost:8080/cart/checkout'
+                success_url: `https://entregablesbackend-production.up.railway.app/api/carts/create-ticket/${cid}`,
+                cancel_url: 'https://entregablesbackend-production.up.railway.app/cart/checkout'
             });
             res.locals.sessionurl = session.url;
             next();
@@ -338,7 +338,7 @@ class CartsController {
                 }
                 const result = await CartsServices.update({_id: cid}, {$pullAll: {products: [{_id: product._id}]}});
             }
-            res.redirect(303, `http://localhost:8080/ticket/${result._id}`);
+            res.redirect(303, `https://entregablesbackend-production.up.railway.app/ticket/${result._id}`);
         } catch (error) {
             res.status(400).json({
                 error: `DB error: ${error.name} - Code: ${error.code}`,
