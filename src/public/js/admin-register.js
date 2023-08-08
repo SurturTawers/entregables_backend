@@ -1,4 +1,3 @@
-import config from "../../config/config.js";
 
 document.getElementById('adminRegisterForm').addEventListener('submit', function (event) {
     event.preventDefault();
