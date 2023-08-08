@@ -1,6 +1,6 @@
 document.getElementById('newProductForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    fetch('http://localhost:8080/api/products', {
+    fetch('https://entregablesbackend-production.up.railway.app/api/products', {
         method: "POST",
         body: JSON.stringify({
             title: event.target.title.value,

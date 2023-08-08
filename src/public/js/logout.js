@@ -1,8 +1,8 @@
 function logout() {
-    fetch('http://localhost:8080/api/logout', {
+    fetch('https://entregablesbackend-production.up.railway.app/api/logout', {
         method: "POST",
     }).then((res) => {
-        window.location = 'http://localhost:8080/login';
+        window.location = 'https://entregablesbackend-production.up.railway.app/login';
     }).catch(err => {
         alert(err);
     });

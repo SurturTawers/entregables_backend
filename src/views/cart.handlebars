@@ -18,7 +18,7 @@
 {{/each}}
 {{#if products}}
     <div>
-        <button type="button" onclick="window.location = 'http://localhost:8080/cart/checkout'">Pagar</button>
+        <button type="button" onclick="window.location = 'https://entregablesbackend-production.up.railway.app/cart/checkout'">Pagar</button>
     </div>
 {{else}}
     <span>No hay productos en su carrito</span>
@@ -31,7 +31,7 @@
         const cid = event.target.cart_id.value;
         const qty = document.getElementById(`${pid}_prod_qty`);
         const prod_qty = document.getElementById(`${pid}_qty`);
-        fetch(`http://localhost:8080/api/carts/${cid}/products/${pid}`, {
+        fetch(`https://entregablesbackend-production.up.railway.app/api/carts/${cid}/products/${pid}`, {
             method: event.submitter.id === 'quitarUnoButton' && qty.value > 0 ? "PUT" : "DELETE",
             body: JSON.stringify({
                 quantity: qty.value - 1

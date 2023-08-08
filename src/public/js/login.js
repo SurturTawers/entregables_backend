@@ -1,6 +1,6 @@
 document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    fetch('http://localhost:8080/api/login', {
+    fetch('https://entregablesbackend-production.up.railway.app/api/login', {
         method: "POST",
         body: JSON.stringify({
             email: event.target.email.value,
@@ -11,7 +11,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         }
     }).then((res) => {
         if (res.ok) {
-            window.location = "http://localhost:8080/home";
+            window.location = "https://entregablesbackend-production.up.railway.app/home";
         } else {
             return res.json();
         }

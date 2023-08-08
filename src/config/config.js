@@ -15,4 +15,6 @@ export default {
     stripeSecret: process.env.STRIPE_SECRET_KEY,
     userEmail: process.env.USER_EMAIL,
     userPass:process.env.USER_PASS,
+    devUrl: process.env.DEV_URL,
+    deploymentUrl: process.env.DEPLOYMENT_URL
 }

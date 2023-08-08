@@ -1,6 +1,8 @@
+import config from "../../config/config.js";
+
 document.getElementById('adminRegisterForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    fetch('http://localhost:8080/api/admin/register', {
+    fetch(`https://entregablesbackend-production.up.railway.app/api/admin/register`, {
         method: "POST",
         body: JSON.stringify({
             email: event.target.adminEmail.value,
@@ -13,7 +15,7 @@ document.getElementById('adminRegisterForm').addEventListener('submit', function
         }
     }).then((res) => {
         if (res.ok) {
-            window.location = "http://localhost:8080/home";
+            window.location = `https://entregablesbackend-production.up.railway.app/home`;
         } else {
             return res.json();
         }

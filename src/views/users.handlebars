@@ -28,7 +28,7 @@
 <script>
     function editRole(uid, role) {
         const msg = document.getElementById(`messageUser_${uid}`);
-        fetch(`http://localhost:8080/api/edit-role/${uid}`, {
+        fetch(`https://entregablesbackend-production.up.railway.app/api/edit-role/${uid}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -58,7 +58,7 @@
 
     function deleteUser(uid) {
         const msg = document.getElementById(`messageUser_${uid}`);
-        fetch(`http://localhost:8080/api/delete/${uid}`, {
+        fetch(`https://entregablesbackend-production.up.railway.app/api/delete/${uid}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"

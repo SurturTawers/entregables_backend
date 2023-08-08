@@ -18,8 +18,8 @@ class ProductsController {
                         page: pagRes.page,
                         hasPrevPage: pagRes.hasPrevPage,
                         hasNextPage: pagRes.hasNextPage,
-                        prevLink: pagRes.hasPrevPage ? `http://localhost:${process.env.APP_PORT}/api/products?limit=${limit ? limit : 10}&page=${page ? page - 1 : null}&${sort ? `sort=${sort}` : null}&${query ? `query=${query}` : null}` : null,
-                        nextLink: pagRes.hasNextPage ? `http://localhost:${process.env.APP_PORT}/api/products?limit=${limit ? limit : 10}&page=${page ? page + 1 : null}&${sort ? `sort=${sort}` : null}&${query ? `query=${query}` : null}` : null
+                        prevLink: pagRes.hasPrevPage ? `https://entregablesbackend-production.up.railway.app/api/products?limit=${limit ? limit : 10}&page=${page ? page - 1 : null}&${sort ? `sort=${sort}` : null}&${query ? `query=${query}` : null}` : null,
+                        nextLink: pagRes.hasNextPage ? `https://entregablesbackend-production.up.railway.app/api/products?limit=${limit ? limit : 10}&page=${page ? page + 1 : null}&${sort ? `sort=${sort}` : null}&${query ? `query=${query}` : null}` : null
                     },
                     pagRes: pagRes
                 }

@@ -37,7 +37,7 @@
     function submitProduct(id) {
         const ids = [];
         ids.push(id);
-        fetch('http://localhost:8080/api/carts', {
+        fetch('https://entregablesbackend-production.up.railway.app/api/carts', {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -48,7 +48,7 @@
         });/**/
     }
     function deleteProduct(pid){
-        fetch(`http://localhost:8080/api/products/${pid}`, {
+        fetch(`https://entregablesbackend-production.up.railway.app/api/products/${pid}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"

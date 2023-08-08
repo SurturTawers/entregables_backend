@@ -12,6 +12,7 @@ import { addLogger } from './utils/logger.js';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerui from 'swagger-ui-express';
 import cookieParser from 'cookie-parser';
+import * as http from "http";
 
 // SWAGGER OPTIONS
 const swaggerOptions = {
@@ -71,7 +72,8 @@ app.use('/',router);
 app.use('/api-docs', swaggerui.serve, swaggerui.setup(specs));
 
 // SERVER INIT
-const server = app.listen(config.port || 8080, ()=>{
-    console.log("Listening on http://localhost:" + config.port || 8080);
+const server = http.createServer(app);
+server.listen(config.port || 8080, ()=>{
+    console.log("Listening on https://entregablesbackend-production.up.railway.app/ on port: " + config.port || 8080);
 })
 server.on("error",error=>console.log(error));

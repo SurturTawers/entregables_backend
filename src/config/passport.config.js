@@ -21,7 +21,7 @@ export const initPassport = () => {
     const githubOptions = {
         clientID: config.githubClientID,
         clientSecret: config.githubSecret,
-        callbackURL: "http://127.0.0.1:8080/api/github/login"
+        callbackURL: "https://entregablesbackend-production.up.railway.app/api/github/login"
     }
 
     passport.use('jwt', new JWTStrategy({
