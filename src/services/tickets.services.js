@@ -6,7 +6,7 @@ export default class TicketsServices{
         return ticketRepository.getTickets(email);
     }
 
-    static getById(tid){
-        return ticketRepository.getById(tid);
+    static getById(tid, populate){
+        return ticketRepository.getById(tid,populate);
     }
 }

@@ -15,34 +15,12 @@
         <li><a href="http://localhost:8080/home">Home</a></li>
         <li><a href="http://localhost:8080/products">Productos</a></li>
         <li><a href="http://localhost:8080/cart">Carrito</a></li>
-        <li><a href="http://localhost:8080/purchases">Mis compras</a></li>
-        <li><a href="http://localhost:8080/mockingproducts/">Products mock</a></li>
         <li><a href="http://localhost:8080/new-product">Crear Producto</a></li>
-        <li><a href="http://localhost:8080/api">Usuarios</a></li>
-        <li><a class="button" onclick="clearUsers()">Clear users</a></li>
+        <li><a href="http://localhost:8080/purchases">Mis compras</a></li>
         <li><a  href="#" onclick="logout();return false;">Logout</a></li>
     </ul>
 </nav>
 {{{body}}}
 </body>
 <script src="/js/logout.js"></script>
-<script>
-    function clearUsers(){
-        fetch("http://localhost:8080/api",{
-            method:"DELETE"
-        }).then((res)=>{
-          return res.json();
-        }).then((data)=>{
-            const {error, message, result} = data;
-            if(error){
-                console.log(error, message);
-            }else{
-                alert(message);
-                console.log(result);
-            }
-        }).catch((err)=>{
-            console.log(err);
-        });
-    }
-</script>
 </html>

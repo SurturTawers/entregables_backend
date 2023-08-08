@@ -1,0 +1,81 @@
+<h1>Users</h1>
+{{#if users}}
+    {{#each users}}
+        <div id="" style="background-color:lightblue; text-align:center">
+            <h2>{{email}}</h2>
+            <h4>ID: {{_id}}</h4>
+            <p id="rol_{{_id}}"><b>Rol:</b> {{role}}</p>
+            <p><b>ID carrito:</b> {{carrito}}</p>
+            <p><b>Last login:</b> {{loginDate}}</p>
+            <p><b>Expires in:</b> {{expireDate}}</p>
+            <div style="display: block">
+                <button style="color: red" onclick="deleteUser(`{{_id}}`)">Eliminar usuario</button>
+                <div style="display: flex">
+                    <select id="selectRole_{{_id}}">
+                        <option value="user">User</option>
+                        <option value="premium">Premium</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button onclick="editRole(`{{_id}}`,document.getElementById('selectRole_{{_id}}').value)">Actualizar rol</button>
+                </div>
+            </div>
+            <p id="messageUser_{{_id}}"></p>
+        </div>
+    {{/each}}
+{{else}}
+    <p>No hay usuarios</p>
+{{/if}}
+<script>
+    function editRole(uid, role) {
+        const msg = document.getElementById(`messageUser_${uid}`);
+        fetch(`http://localhost:8080/api/edit-role/${uid}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                role: role
+            })
+        }).then((res) => {
+            return res.json();
+        }).then((data) => {
+            const {message, result, error} = data;
+            if (message && !error) {
+                msg.innerText = message;
+                msg.style = "color: green";
+                document.getElementById(`rol_${uid}`).innerHTML = `<b>Rol:</b> ${role}`;
+            }else if(error){
+                msg.innerText = "Error, intentelo nuevamente";
+                msg.style = "color:red";
+                console.log(error,message);
+            }
+        }).catch((error,message) => {
+            msg.innerText = "Error, intentelo nuevamente";
+            msg.style = "color:red";
+            console.log(error,message);
+        });/**/
+    }
+
+    function deleteUser(uid) {
+        const msg = document.getElementById(`messageUser_${uid}`);
+        fetch(`http://localhost:8080/api/delete/${uid}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then((res) => {
+            return res.json();
+        }).then((data) => {
+            const {message, result} = data;
+            if (message) {
+                msg.innerText = message;
+                msg.style = "color: green";
+                //console.log(result);
+            }
+        }).catch((error) => {
+            msg.innerText = "Error, intentelo nuevamente";
+            msg.style = "color:red";
+            console.log(error);
+        });/**/
+    }
+</script>

@@ -29,7 +29,7 @@ viewsRouter.get('/admin/register', (req, res) => {
 })
 
 viewsRouter.get('/home', JWTAuthMiddleware('jwt'), (req, res) => {
-    res.render('home', {layout: req.user.role === 'admin' ? 'admin-main' : 'main'});
+    res.render('home', {layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')});
 });
 
 viewsRouter.get('/products', JWTAuthMiddleware('jwt'), ProductsController.getProducts, (req, res) => {
@@ -40,19 +40,22 @@ viewsRouter.get('/products', JWTAuthMiddleware('jwt'), ProductsController.getPro
         length: pagRes.totalDocs,
         usuario: req.session.user,
         rol: req.session.role,
-        layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        isAdminOrPremium: req.user.role === 'admin' || req.user.role === 'premium' ? true : false,
+        layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
     });
 });
 
-viewsRouter.get('/new-product', JWTAuthMiddleware('jwt'), authRoleMiddleware('admin'), ProductsController.getProducts, (req, res) => {
-    res.render('createProduct', {layout: 'admin-main'});
+viewsRouter.get('/new-product', JWTAuthMiddleware('jwt'), authRoleMiddleware('premium'), ProductsController.getProducts, (req, res) => {
+    res.render('createProduct', {layout: req.user.role === 'admin' ? 'admin-main': 'premium-main'});
 });
 
 viewsRouter.get('/products/:pid', JWTAuthMiddleware('jwt'), ProductsController.getProductById, (req, res) => {
     const result = res.locals.result;
     res.render('productDetail', {
         product: result ? result.toJSON() : null,
-        layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        role: req.user.role,
+        isAdminOrPremium: req.user.role === 'admin' || req.user.role === 'premium' ? true : false,
+        layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
     });
 });
 
@@ -61,7 +64,7 @@ viewsRouter.get('/cart', JWTAuthMiddleware('jwt'), CartsController.showCartById,
     res.render('cart', {
         cart: result.toJSON(),
         products: count,
-        layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
     });
 });
 
@@ -81,7 +84,7 @@ viewsRouter.get('/cart/checkout', JWTAuthMiddleware('jwt'), CartsController.cart
             leftover: leftover,
             total: total,
             client_secret: intent.client_secret,
-            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+            layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
         });
     }
 });
@@ -91,12 +94,12 @@ viewsRouter.get('/purchases', JWTAuthMiddleware('jwt'), TicketsController.getTic
     if(tickets){
         res.render('purchases', {
             tickets: tickets,
-            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+            layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
         });
     }else{
         res.render('purchases', {
             message: message,
-            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+            layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
         });
     }
 });
@@ -106,12 +109,12 @@ viewsRouter.get('/ticket/:tid', JWTAuthMiddleware('jwt'), TicketsController.getT
     if(ticket){
         res.render('purchase-ticket', {
             ticket: ticket.toJSON(),
-            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+            layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
         });
     }else{
         res.render('purchase-ticket', {
             message: message,
-            layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+            layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
         });
     }
 });
@@ -124,7 +127,7 @@ viewsRouter.get('/mockingproducts', JWTAuthMiddleware('jwt'), authRoleMiddleware
     res.render('productsmock', {
         productos: mockedProducts,
         length: 1,
-        layout: req.user.role === 'admin' ? 'admin-main' : 'main'
+        layout: req.user.role === 'admin' ? 'admin-main' : (req.user.role === 'premium' ? 'premium-main': 'main')
     })
 });
 

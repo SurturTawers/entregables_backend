@@ -39,7 +39,7 @@ class TicketsController{
         }
 
         try {
-            const ticket = await TicketsServices.getById(tid);
+            const ticket = await TicketsServices.getById(tid,'items.id_producto');
             if(ticket){
                 res.locals.data = {ticket: ticket};
             }else{

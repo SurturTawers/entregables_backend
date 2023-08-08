@@ -9,8 +9,8 @@ export default class Ticket{
         return this.dao.getTickets(email);
     }
 
-    getById(tid){
-        return this.dao.getById(tid);
+    getById(tid,populate){
+        return this.dao.getById(tid,populate);
     }
 
     create(purchaseInfo){

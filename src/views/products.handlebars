@@ -7,8 +7,16 @@
                 <p><b>ID:</b> {{_id}}</p>
             </a>
             {{#if stock}}
-                <button type="button" onclick="submitProduct(document.getElementById('{{_id}}').id)">Agregar al carrito
-                </button>
+                <div>
+                    <button type="button" onclick="submitProduct(document.getElementById('{{_id}}').id)">
+                        Agregar al carrito
+                    </button>
+                    {{#if ../isAdminOrPremium}}
+                        <button type="button" onclick="deleteProduct(`{{_id}}`)">
+                            Eliminar producto
+                        </button>
+                    {{/if}}
+                </div>
             {{/if}}
         </div>
     {{/each}}
@@ -37,6 +45,21 @@
             body: JSON.stringify(ids)
         }).then(() => {
             alert("Agregado correctamente en carrito")
+        });/**/
+    }
+    function deleteProduct(pid){
+        fetch(`http://localhost:8080/api/products/${pid}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then((res)=>{
+            return res.json();
+        }).then((data) => {
+            alert("Eliminado correctamente")
+            console.log(data.message);
+        }).catch((err)=>{
+            console.log(err);
         });/**/
     }
 </script>

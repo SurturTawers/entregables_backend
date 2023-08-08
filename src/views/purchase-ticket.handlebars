@@ -3,7 +3,7 @@
         <h2>Ticket: {{ticket._id}}</h2>
         {{#each ticket.items}}
             <div style="border: solid; ">
-                <p><b>Producto: </b> {{id_producto}}</p>
+                <p><b>Producto: </b> {{id_producto.title}}</p>
                 <p><b>Cantidad: </b> {{cantidad}}</p>
                 <p><b>Subtotal: </b> ${{subtotal}}</p>
             </div>

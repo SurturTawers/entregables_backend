@@ -10,6 +10,8 @@ const productsSchema = new mongoose.Schema({
     stock: {type: Number, required: true},
     category: {type: String, required: true},
     thumbnails: [{type: String}],
+    createdBy: {type:String, required:true},
+    userRole: {type:String, required: true}
 }, {timestamps: true,});
 
 productsSchema.plugin(mongoosePaginate);

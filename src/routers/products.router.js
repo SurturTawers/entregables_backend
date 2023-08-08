@@ -11,7 +11,7 @@ productsRouter.get('/', JwtAuthMiddleware('jwt'), authRoleMiddleware('admin'), P
 });
 
 //crear producto
-productsRouter.post('/', ProductsController.createProduct);
+productsRouter.post('/', JwtAuthMiddleware('jwt'), authRoleMiddleware('premium'), ProductsController.createProduct);
 
 //obtener producto por pid
 productsRouter.get('/:pid', ProductsController.getProductById, (req, res) => {
@@ -22,6 +22,6 @@ productsRouter.get('/:pid', ProductsController.getProductById, (req, res) => {
 productsRouter.put('/:pid', ProductsController.updateProductById);
 
 //borrar producto por pid
-productsRouter.delete('/:pid', ProductsController.deleteProductById);
+productsRouter.delete('/:pid', JwtAuthMiddleware('jwt'), authRoleMiddleware('premium'), ProductsController.deleteProductById);
 
 export default productsRouter;

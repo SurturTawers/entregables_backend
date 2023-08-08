@@ -6,7 +6,8 @@ export default class Ticket{
         return ticketModel.find({purchaser: email});
     }
 
-    getById(tid){
+    getById(tid, populate){
+        if(populate) return ticketModel.findById(tid).populate(populate);
         return ticketModel.findById(tid);
     }
 

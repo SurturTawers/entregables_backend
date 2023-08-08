@@ -2,8 +2,19 @@ import {Router} from "express";
 import passport from 'passport';
 import AuthController from "../controllers/auth.controller.js";
 import {jwtTokenGenerator} from "../utils.js";
+import JWTAuthMiddleware from "../middlewares/jwt-auth.middleware.js";
+import authRoleMiddleware from "../middlewares/user-auth.middleware.js";
+import UsersController from "../controllers/users.controller.js";
 
 const usersRouter = Router();
+
+usersRouter.get('/', JWTAuthMiddleware('jwt'), authRoleMiddleware('admin'), UsersController.getAllUsers);
+
+usersRouter.delete('/', JWTAuthMiddleware('jwt'), authRoleMiddleware('admin'), UsersController.deleteExpiredUsers);
+
+usersRouter.delete('/delete/:uid', JWTAuthMiddleware('jwt'), authRoleMiddleware('admin'), UsersController.deleteUserById);
+
+usersRouter.put('/edit-role/:uid', JWTAuthMiddleware('jwt'), authRoleMiddleware('admin'), UsersController.updateUserRole);
 
 usersRouter.post('/register', function (req, res, next) {
     passport.authenticate('register', function (error, user, info) {

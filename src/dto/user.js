@@ -4,5 +4,7 @@ export default class UserDTO{
         this.password = user.password;
         this.role = user.role;
         this.carrito = user.carrito;
+        this.loginDate= user.loginDate;
+        this.expireDate = user.expireDate;
     }
 }
